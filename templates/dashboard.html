@@ -76,31 +76,26 @@
             {% if tasks_today %}
             <div class="space-y-3">
                 {% for task in tasks_today %}
-                <div class="p-4 bg-bg-tertiary rounded-xl border-l-4 
-                    {% if task.priority == 'high' %}border-danger
-                    {% elif task.priority == 'medium' %}border-warning
-                    {% else %}border-info{% endif %}">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-semibold text-gray-100 mb-1">{{ task.title }}</h3>
-                            <div class="flex items-center gap-2 text-xs text-gray-500">
-                                {% if task.due_date %}
-                                    <span class="flex items-center gap-1">
-                                        {% include "includes/heroicon.html" with icon_name="clock" class="icon-sm" %}
-                                        {{ task.due_date|date:"g:i A" }}
-                                    </span>
-                                {% endif %}
-                                {% if task.task_list %}
-                                    <span class="flex items-center gap-1">
-                                        {% include "includes/heroicon.html" with icon_name="list-bullet" class="icon-sm" %}
-                                        {{ task.task_list.name }}
-                                    </span>
-                                {% endif %}
-                            </div>
+                <div class="task-item priority-{{ task.priority }}">
+                    <div class="task-content">
+                        <h3 class="task-title">{{ task.title }}</h3>
+                        <div class="task-meta">
+                            {% if task.due_date %}
+                                <span class="flex items-center gap-1 text-sm text-muted">
+                                    {% include "includes/heroicon.html" with icon_name="clock" class="icon-sm" %}
+                                    {{ task.due_date|date:"g:i A" }}
+                                </span>
+                            {% endif %}
+                            {% if task.task_list %}
+                                <span class="flex items-center gap-1 text-sm text-muted">
+                                    {% include "includes/heroicon.html" with icon_name="list-bullet" class="icon-sm" %}
+                                    {{ task.task_list.name }}
+                                </span>
+                            {% endif %}
                         </div>
-                        <div class="flex items-center gap-2">
-                            {% include "tasks/partials/priority_icon.html" with priority=task.priority %}
-                        </div>
+                    </div>
+                    <div class="task-actions">
+                        {% include "tasks/partials/priority_icon.html" with priority=task.priority %}
                     </div>
                 </div>
                 {% endfor %}
@@ -127,7 +122,7 @@
             {% if habits %}
             <div class="grid grid-2 gap-4">
                 {% for habit in habits %}
-                <div class="p-4 bg-bg-tertiary rounded-xl text-center border border-border hover:border-border-hover transition-colors">
+                <div class="card text-center">
                     <div class="text-3xl mb-2">{{ habit.icon }}</div>
                     <div class="font-semibold mb-3">{{ habit.name }}</div>
                     <div class="flex items-center justify-center gap-3">
@@ -138,7 +133,7 @@
                         {% else %}
                         <div class="w-8 h-8 rounded-full border-2 border-border hover:border-primary cursor-pointer transition-colors"></div>
                         {% endif %}
-                        <span class="text-xs font-bold text-gray-500">
+                        <span class="text-xs font-bold text-muted">
                             {{ habit.current_streak }}d streak
                         </span>
                     </div>
@@ -188,12 +183,12 @@
             {% if recent_notes %}
             <div class="space-y-3">
                 {% for note in recent_notes %}
-                <a href="{% url 'note_detail' note.id %}" class="block p-4 bg-bg-tertiary rounded-xl border border-transparent hover:border-border-hover hover:bg-white/5 transition-all">
-                    <div class="font-semibold mb-1 text-gray-100">{{ note.title }}</div>
-                    <div class="text-sm text-gray-500 line-clamp-1 mb-2">
+                <a href="{% url 'note_detail' note.id %}" class="block card transition-all">
+                    <div class="font-semibold mb-1 text-primary">{{ note.title }}</div>
+                    <div class="text-sm text-secondary line-clamp-1 mb-2">
                         {{ note.content|truncatewords:10 }}
                     </div>
-                    <div class="text-[10px] text-gray-600 font-bold uppercase tracking-wider">
+                    <div class="text-[10px] text-muted font-bold uppercase tracking-wider">
                         Updated {{ note.updated_at|timesince }} ago
                     </div>
                 </a>
