@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ task.title }}</h1>
+        <p class="page-subtitle">Task Details</p>
+    </div>
+    <div style="display: flex; gap: 1rem;">
+        <a href="{% url 'task_list' %}" class="btn btn-secondary">← Back</a>
+        <a href="{% url 'task_update' task.id %}" class="btn btn-secondary">✏️ Edit</a>
+    </div>
+</div>
+
+<div class="task-detail-container">
+    <div class="task-detail-main">
+        <div class="detail-section">
+            <h2>Description</h2>
+            <p>{{ task.description|default:"No description provided"|linebreaks }}</p>
+        </div>
+        
+        <div class="detail-section">
+            <h2>Details</h2>
+            <div class="detail-grid">
+                <div>
+                    <strong>Status:</strong>
+                    <span class="status-badge status-{{ task.status }}">{{ task.get_status_display }}</span>
+                </div>
+                <div>
+                    <strong>Priority:</strong>
+                    <span class="priority-badge priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+                </div>
+                <div>
+                    <strong>Due Date:</strong>
+                    {{ task.due_date|date:"F d, Y g:i A"|default:"Not set" }}
+                </div>
+                <div>
+                    <strong>Created:</strong>
+                    {{ task.created_at|date:"F d, Y" }}
+                </div>
+            </div>
+        </div>
+        
+        {% if task.tags %}
+        <div class="detail-section">
+            <h2>Tags</h2>
+            <div class="tags">
+                {{ task.tags }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.task-detail-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.task-detail-main {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+.detail-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.detail-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.detail-section h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.detail-grid div {
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+}
+
+.detail-grid strong {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.status-badge, .priority-badge {
+    padding: 0.375rem 0.875rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-pitched { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.status-in_progress { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.status-completed { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.status-paid { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+.priority-high { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.priority-medium { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.priority-low { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+
+.tags {
+    color: var(--text-secondary);
+}
+</style>
+{% endblock %}

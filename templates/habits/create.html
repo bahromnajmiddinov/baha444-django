@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Habit{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Create New Habit 🔥</h1>
+</div>
+
+<div class="form-container">
+    <form method="post" class="habit-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Habit Name *</label>
+            <input type="text" name="name" placeholder="e.g., Morning meditation" required autofocus>
+        </div>
+        
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" rows="3" placeholder="Why is this habit important to you?"></textarea>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>Icon</label>
+                <select name="icon">
+                    <option value="🔥">🔥 Fire</option>
+                    <option value="💪">💪 Strong</option>
+                    <option value="📚">📚 Reading</option>
+                    <option value="🏃">🏃 Running</option>
+                    <option value="🧘">🧘 Meditation</option>
+                    <option value="💧">💧 Water</option>
+                    <option value="🥗">🥗 Healthy Eating</option>
+                    <option value="😴">😴 Sleep</option>
+                    <option value="✍️">✍️ Writing</option>
+                    <option value="🎨">🎨 Creative</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Frequency</label>
+                <select name="frequency">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Color</label>
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <label style="cursor: pointer;">
+                    <input type="radio" name="color" value="#FF5722" checked style="display: none;">
+                    <div style="width: 48px; height: 48px; background: #FF5722; border-radius: 8px; border: 3px solid transparent;"></div>
+                </label>
+                <label style="cursor: pointer;">
+                    <input type="radio" name="color" value="#4CAF50" style="display: none;">
+                    <div style="width: 48px; height: 48px; background: #4CAF50; border-radius: 8px; border: 3px solid transparent;"></div>
+                </label>
+                <label style="cursor: pointer;">
+                    <input type="radio" name="color" value="#2196F3" style="display: none;">
+                    <div style="width: 48px; height: 48px; background: #2196F3; border-radius: 8px; border: 3px solid transparent;"></div>
+                </label>
+                <label style="cursor: pointer;">
+                    <input type="radio" name="color" value="#9C27B0" style="display: none;">
+                    <div style="width: 48px; height: 48px; background: #9C27B0; border-radius: 8px; border: 3px solid transparent;"></div>
+                </label>
+                <label style="cursor: pointer;">
+                    <input type="radio" name="color" value="#FF9800" style="display: none;">
+                    <div style="width: 48px; height: 48px; background: #FF9800; border-radius: 8px; border: 3px solid transparent;"></div>
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <a href="{% url 'habit_list' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">🔥 Create Habit</button>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-container { max-width: 700px; margin: 0 auto; }
+.habit-form { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; }
+.form-group { margin-bottom: 1.5rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary); }
+input, textarea, select { width: 100%; padding: 0.875rem 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 12px; color: var(--text-primary); font-family: inherit; font-size: 1rem; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+.form-actions { display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end; }
+</style>
+
+<script>
+document.querySelectorAll('input[name="color"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.querySelectorAll('input[name="color"] + div').forEach(div => {
+            div.style.borderColor = 'transparent';
+        });
+        this.nextElementSibling.style.borderColor = this.value;
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Daily Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">📊 Daily Tracker</h1>
+        <p class="page-subtitle">Track your mood, habits, and daily progress</p>
+    </div>
+    <div style="color: var(--text-secondary); font-size: 1rem;">
+        {{ today|date:"l, F d, Y" }}
+    </div>
+</div>
+
+<div class="grid grid-2">
+    <div class="card">
+        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">How are you feeling? 😊</h2>
+        <div style="display: flex; justify-content: space-around; margin-bottom: 2rem;">
+            {% for mood_val, mood_label in daily_entry.MOOD_CHOICES %}
+            <button class="mood-btn {% if daily_entry.mood == mood_val %}active{% endif %}" 
+                    style="font-size: 3rem; background: {% if daily_entry.mood == mood_val %}rgba(99, 102, 241, 0.15){% else %}var(--bg-tertiary){% endif %}; 
+                    border: 2px solid {% if daily_entry.mood == mood_val %}var(--primary){% else %}transparent{% endif %}; 
+                    padding: 1rem; border-radius: 12px; cursor: pointer; transition: all 0.2s;">
+                {{ mood_label|slice:":2" }}
+            </button>
+            {% endfor %}
+        </div>
+        
+        <h3 style="font-weight: 600; margin-bottom: 0.75rem;">Morning Notes</h3>
+        <textarea placeholder="How's your day starting? What are your intentions?" 
+            style="width: 100%; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
+            border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical; min-height: 100px; margin-bottom: 1.5rem;">{{ daily_entry.morning_notes }}</textarea>
+        
+        <h3 style="font-weight: 600; margin-bottom: 0.75rem;">Evening Reflection</h3>
+        <textarea placeholder="How did your day go? What did you learn?" 
+            style="width: 100%; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
+            border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical; min-height: 100px;">{{ daily_entry.evening_notes }}</textarea>
+    </div>
+    
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <div class="card">
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Today's Wins 🎉</h2>
+            <textarea placeholder="What went well today? Celebrate your wins!" 
+                style="width: 100%; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
+                border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical; min-height: 100px;">{{ daily_entry.wins }}</textarea>
+        </div>
+        
+        <div class="card">
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Gratitude 🙏</h2>
+            <textarea placeholder="What are you grateful for today?" 
+                style="width: 100%; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
+                border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical; min-height: 100px;">{{ daily_entry.gratitude }}</textarea>
+        </div>
+        
+        <div class="card">
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Quick Metrics</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-secondary); font-size: 0.875rem;">💧 Water (glasses)</label>
+                    <input type="number" value="{{ daily_entry.water_intake }}" min="0" max="20"
+                        style="width: 100%; padding: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
+                        border-radius: 8px; color: var(--text-primary); font-size: 1.5rem; font-weight: 700; text-align: center;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-secondary); font-size: 0.875rem;">🏃 Exercise (min)</label>
+                    <input type="number" value="{{ daily_entry.exercise_minutes }}" min="0"
+                        style="width: 100%; padding: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
+                        border-radius: 8px; color: var(--text-primary); font-size: 1.5rem; font-weight: 700; text-align: center;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.mood-btn:hover {
+    transform: scale(1.1);
+}
+</style>
+{% endblock %}

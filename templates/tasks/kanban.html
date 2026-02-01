@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+
+{% block title %}Tasks - Kanban View{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Tasks</h1>
+        <p class="page-subtitle">Kanban Board</p>
+    </div>
+    <div style="display: flex; gap: 1rem;">
+        <a href="?view=list" class="btn btn-secondary">📋 List</a>
+        <a href="?view=kanban" class="btn btn-secondary">🎯 Kanban</a>
+        <a href="{% url 'task_calendar' %}" class="btn btn-secondary">📅 Calendar</a>
+        <a href="{% url 'task_create' %}" class="btn btn-primary">➕ New Task</a>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; height: calc(100vh - 200px);">
+    <!-- Pitched Column -->
+    <div class="kanban-column" data-status="pitched">
+        <div class="kanban-header">
+            <h3>📌 Pitched</h3>
+            <span class="kanban-count">{{ tasks|filter_status:'pitched'|length }}</span>
+        </div>
+        <div class="kanban-cards">
+            {% for task in tasks %}
+                {% if task.status == 'pitched' %}
+                <div class="task-card" data-task-id="{{ task.id }}" draggable="true">
+                    <div class="task-card-header">
+                        <h4>{{ task.title }}</h4>
+                        <span class="priority-badge priority-{{ task.priority }}">
+                            {{ task.get_priority_display }}
+                        </span>
+                    </div>
+                    {% if task.description %}
+                    <p class="task-description">{{ task.description|truncatewords:15 }}</p>
+                    {% endif %}
+                    {% if task.due_date %}
+                    <div class="task-meta">
+                        <span>📅 {{ task.due_date|date:"M d, Y" }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="task-tags">
+                        {{ task.tags }}
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- In Progress Column -->
+    <div class="kanban-column" data-status="in_progress">
+        <div class="kanban-header">
+            <h3>🚀 In Progress</h3>
+            <span class="kanban-count">{{ tasks|filter_status:'in_progress'|length }}</span>
+        </div>
+        <div class="kanban-cards">
+            {% for task in tasks %}
+                {% if task.status == 'in_progress' %}
+                <div class="task-card" data-task-id="{{ task.id }}" draggable="true">
+                    <div class="task-card-header">
+                        <h4>{{ task.title }}</h4>
+                        <span class="priority-badge priority-{{ task.priority }}">
+                            {{ task.get_priority_display }}
+                        </span>
+                    </div>
+                    {% if task.description %}
+                    <p class="task-description">{{ task.description|truncatewords:15 }}</p>
+                    {% endif %}
+                    {% if task.due_date %}
+                    <div class="task-meta">
+                        <span>📅 {{ task.due_date|date:"M d, Y" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Completed Column -->
+    <div class="kanban-column" data-status="completed">
+        <div class="kanban-header">
+            <h3>✅ Completed</h3>
+            <span class="kanban-count">{{ tasks|filter_status:'completed'|length }}</span>
+        </div>
+        <div class="kanban-cards">
+            {% for task in tasks %}
+                {% if task.status == 'completed' %}
+                <div class="task-card" data-task-id="{{ task.id }}" draggable="true">
+                    <div class="task-card-header">
+                        <h4>{{ task.title }}</h4>
+                        <span class="priority-badge priority-{{ task.priority }}">
+                            {{ task.get_priority_display }}
+                        </span>
+                    </div>
+                    {% if task.completed_date %}
+                    <div class="task-meta">
+                        <span>✓ {{ task.completed_date|date:"M d" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Paid Column -->
+    <div class="kanban-column" data-status="paid">
+        <div class="kanban-header">
+            <h3>💰 Paid</h3>
+            <span class="kanban-count">{{ tasks|filter_status:'paid'|length }}</span>
+        </div>
+        <div class="kanban-cards">
+            {% for task in tasks %}
+                {% if task.status == 'paid' %}
+                <div class="task-card" data-task-id="{{ task.id }}" draggable="true">
+                    <div class="task-card-header">
+                        <h4>{{ task.title }}</h4>
+                    </div>
+                    {% if task.completed_date %}
+                    <div class="task-meta">
+                        <span>✓ {{ task.completed_date|date:"M d" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.kanban-column {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.kanban-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.kanban-header h3 {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.kanban-count {
+    background: var(--bg-tertiary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.kanban-cards {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.task-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: grab;
+    transition: all 0.2s;
+}
+
+.task-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--glow-primary);
+}
+
+.task-card:active {
+    cursor: grabbing;
+}
+
+.task-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 0.75rem;
+}
+
+.task-card-header h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    flex: 1;
+}
+
+.priority-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.priority-high {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--danger);
+}
+
+.priority-medium {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning);
+}
+
+.priority-low {
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--info);
+}
+
+.task-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.task-meta {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+</style>
+
+<script>
+// Drag and drop functionality
+const cards = document.querySelectorAll('.task-card');
+const columns = document.querySelectorAll('.kanban-cards');
+
+cards.forEach(card => {
+    card.addEventListener('dragstart', dragStart);
+    card.addEventListener('dragend', dragEnd);
+});
+
+columns.forEach(column => {
+    column.addEventListener('dragover', dragOver);
+    column.addEventListener('drop', drop);
+});
+
+function dragStart(e) {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', this.innerHTML);
+    e.dataTransfer.setData('taskId', this.dataset.taskId);
+    this.style.opacity = '0.4';
+}
+
+function dragEnd(e) {
+    this.style.opacity = '1';
+}
+
+function dragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+}
+
+function drop(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    const taskId = e.dataTransfer.getData('taskId');
+    const status = this.parentElement.dataset.status;
+    
+    // Update task status via AJAX
+    fetch(`/tasks/${taskId}/status/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ status: status })
+    }).then(() => {
+        location.reload();
+    });
+    
+    return false;
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

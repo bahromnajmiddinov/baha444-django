@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - FlowHub{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Welcome back! 👋</h1>
+        <p class="page-subtitle">Here's what's happening with your productivity today</p>
+    </div>
+    <a href="{% url 'task_create' %}" class="btn btn-primary">
+        <span>➕</span>
+        <span>New Task</span>
+    </a>
+</div>
+
+<!-- Stats Overview -->
+<div class="grid grid-4" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-label">Total Tasks</div>
+        <div class="stat-value">{{ tasks_total }}</div>
+        <div class="stat-change positive">
+            <span>↗</span>
+            <span>{{ tasks_in_progress }} in progress</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-label">Completed Today</div>
+        <div class="stat-value">{{ tasks_completed }}</div>
+        <div class="stat-change positive">
+            <span>✓</span>
+            <span>Great work!</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-label">Pomodoro Sessions</div>
+        <div class="stat-value">{{ pomodoro_today }}</div>
+        <div class="stat-change {% if pomodoro_today >= 4 %}positive{% endif %}">
+            <span>⏱️</span>
+            <span>{{ pomodoro_today|floatformat:0 }}h focused</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-label">Monthly Balance</div>
+        <div class="stat-value">${{ balance|floatformat:0 }}</div>
+        <div class="stat-change {% if balance >= 0 %}positive{% else %}negative{% endif %}">
+            <span>{% if balance >= 0 %}↗{% else %}↘{% endif %}</span>
+            <span>${{ income|floatformat:0 }} income</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Grid -->
+<div class="grid grid-2" style="gap: 2rem;">
+    <!-- Left Column -->
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+        <!-- Today's Tasks -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700;">Today's Tasks</h2>
+                <a href="{% url 'task_list' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">View all →</a>
+            </div>
+            
+            {% if tasks_today %}
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for task in tasks_today %}
+                <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: 12px; border-left: 3px solid 
+                    {% if task.priority == 'high' %}var(--danger)
+                    {% elif task.priority == 'medium' %}var(--warning)
+                    {% else %}var(--info){% endif %};">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h3 style="font-weight: 600; margin-bottom: 0.25rem;">{{ task.title }}</h3>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                                {% if task.due_date %}Due: {{ task.due_date|date:"g:i A" }}{% endif %}
+                            </p>
+                        </div>
+                        <span style="padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+                            background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                            {{ task.get_priority_display }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+                <p style="font-weight: 600;">No tasks due today</p>
+                <p style="font-size: 0.875rem;">Enjoy your free time!</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Habit Tracker -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700;">Today's Habits</h2>
+                <a href="{% url 'habit_list' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">View all →</a>
+            </div>
+            
+            {% if habits %}
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                {% for habit in habits %}
+                <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: 12px; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">{{ habit.icon }}</div>
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">{{ habit.name }}</div>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        {% if habit.id in today_completions %}
+                        <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem;">✓</div>
+                        {% else %}
+                        <div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer;"></div>
+                        {% endif %}
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">
+                            {{ habit.current_streak }} day streak 🔥
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                <p>No habits yet. Create your first one!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Right Column -->
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+        <!-- Daily Mood -->
+        <div class="card">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">How are you feeling?</h2>
+            
+            <div style="display: flex; justify-content: space-around; margin-bottom: 1.5rem;">
+                {% for mood, label in daily_entry.MOOD_CHOICES %}
+                <button style="background: {% if daily_entry.mood == mood %}rgba(99, 102, 241, 0.2){% else %}var(--bg-tertiary){% endif %}; 
+                    border: 2px solid {% if daily_entry.mood == mood %}var(--primary){% else %}transparent{% endif %}; 
+                    padding: 1rem; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 2rem;">
+                    {{ label|slice:":2" }}
+                </button>
+                {% endfor %}
+            </div>
+            
+            <textarea placeholder="How's your day going? Write your thoughts..." 
+                style="width: 100%; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
+                border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical; min-height: 100px;">{{ daily_entry.morning_notes }}</textarea>
+        </div>
+        
+        <!-- Recent Notes -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700;">Recent Notes</h2>
+                <a href="{% url 'note_list' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">View all →</a>
+            </div>
+            
+            {% if recent_notes %}
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% for note in recent_notes %}
+                <a href="{% url 'note_detail' note.id %}" style="padding: 0.75rem; background: var(--bg-tertiary); 
+                    border-radius: 8px; text-decoration: none; color: var(--text-primary); transition: all 0.2s;
+                    display: block;">
+                    <div style="font-weight: 600; margin-bottom: 0.25rem;">{{ note.title }}</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                        {{ note.content|truncatewords:10 }}
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        {{ note.updated_at|timesince }} ago
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                <p>No notes yet. Start writing!</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Upcoming Reminders -->
+        {% if upcoming_reminders %}
+        <div class="card">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Upcoming Reminders</h2>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% for reminder in upcoming_reminders %}
+                <div style="padding: 0.75rem; background: var(--bg-tertiary); border-radius: 8px;">
+                    <div style="font-weight: 600;">{{ reminder.title }}</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                        ⏰ {{ reminder.remind_at|date:"M d, g:i A" }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    button:hover {
+        transform: scale(1.05);
+    }
+    
+    a:hover {
+        opacity: 0.8;
+    }
+</style>
+{% endblock %}

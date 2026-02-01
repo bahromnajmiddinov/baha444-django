@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% load math_filters %}
+
+{% block title %}Finance Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">💰 Finance</h1>
+        <p class="page-subtitle">Track your income, expenses, and budgets</p>
+    </div>
+    <button class="btn btn-primary">➕ Add Transaction</button>
+</div>
+
+<div class="grid grid-3" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-label">Total Balance</div>
+        <div class="stat-value">${{ total_balance|floatformat:2 }}</div>
+        <div class="stat-change positive">↗ Across all accounts</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-label">This Month Income</div>
+        <div class="stat-value" style="color: var(--success);">${{ income|floatformat:2 }}</div>
+        <div class="stat-change positive">✓ Revenue</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-label">This Month Expenses</div>
+        <div class="stat-value" style="color: var(--danger);">${{ expenses|floatformat:2 }}</div>
+        <div class="stat-change negative">↘ Spending</div>
+    </div>
+</div>
+
+<div class="grid grid-2">
+    <div class="card">
+        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Recent Transactions</h2>
+        {% if recent_transactions %}
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for transaction in recent_transactions %}
+            <div style="display: flex; justify-content: space-between; padding: 1rem; background: var(--bg-tertiary); border-radius: 12px;">
+                <div>
+                    <div style="font-weight: 600;">{{ transaction.description }}</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">{{ transaction.date|date:"M d, Y" }}</div>
+                </div>
+                <div style="font-size: 1.25rem; font-weight: 700; color: {% if transaction.category.category_type == 'income' %}var(--success){% else %}var(--danger){% endif %};">
+                    {% if transaction.category.category_type == 'expense' %}-{% endif %}${{ transaction.amount }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No transactions yet</p>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Budget Overview</h2>
+        {% if budgets %}
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% for budget in budgets %}
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 600;">{{ budget.category.name }}</span>
+                    <span style="color: var(--text-secondary);">${{ budget.spent|floatformat:0 }} / ${{ budget.amount|floatformat:0 }}</span>
+                </div>
+                <div style="height: 8px; background: var(--bg-tertiary); border-radius: 999px; overflow: hidden;">
+                    <div style="height: 100%; background: {% if budget.percentage_used > 90 %}var(--danger){% elif budget.percentage_used > 70 %}var(--warning){% else %}var(--success){% endif %}; width: {{ budget.percentage_used }}%; transition: width 0.3s;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No budgets set</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

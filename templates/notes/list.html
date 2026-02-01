@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Notes{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">📝 Notes</h1>
+        <p class="page-subtitle">Capture your thoughts and ideas</p>
+    </div>
+    <a href="{% url 'note_create' %}" class="btn btn-primary">➕ New Note</a>
+</div>
+
+<div class="notes-masonry">
+    {% if notes %}
+        {% for note in notes %}
+        <div class="note-card" onclick="window.location.href='{% url 'note_detail' note.id %}'">
+            {% if note.is_pinned %}
+            <div class="pin-badge">📌 Pinned</div>
+            {% endif %}
+            <h3>{{ note.title }}</h3>
+            <p>{{ note.content|truncatewords:30|linebreaks }}</p>
+            <div class="note-footer">
+                <span>{{ note.updated_at|timesince }} ago</span>
+                {% if note.tags.all %}
+                <div class="note-tags">
+                    {% for tag in note.tags.all %}
+                    <span class="tag" style="background: {{ tag.color }}20; color: {{ tag.color }};">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h2>No notes yet</h2>
+            <p>Start writing your first note!</p>
+            <a href="{% url 'note_create' %}" class="btn btn-primary" style="margin-top: 1.5rem;">➕ Create Note</a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.notes-masonry {
+    column-count: 3;
+    column-gap: 1.5rem;
+}
+
+.note-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    break-inside: avoid;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.note-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    transform: translateY(-2px);
+}
+
+.pin-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--warning);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.note-card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.note-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.note-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.note-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tag {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+    .notes-masonry {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .notes-masonry {
+        column-count: 1;
+    }
+}
+</style>
+{% endblock %}

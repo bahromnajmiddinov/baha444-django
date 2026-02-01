@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}Habits Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Habits 🔥</h1>
+        <p class="page-subtitle">Build consistency, one day at a time</p>
+    </div>
+    <a href="{% url 'habit_create' %}" class="btn btn-primary">➕ New Habit</a>
+</div>
+
+<div class="habits-grid">
+    {% if habits %}
+        {% for habit in habits %}
+        <div class="habit-card">
+            <div class="habit-header">
+                <div class="habit-icon" style="background: {{ habit.color }}20; color: {{ habit.color }};">
+                    {{ habit.icon }}
+                </div>
+                <div class="habit-info">
+                    <h3>{{ habit.name }}</h3>
+                    <p>{{ habit.description|truncatewords:10 }}</p>
+                </div>
+            </div>
+            
+            <div class="habit-stats">
+                <div class="stat-item">
+                    <div class="stat-value">{{ habit.current_streak }}</div>
+                    <div class="stat-label">🔥 Day Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ habit.total_completions }}</div>
+                    <div class="stat-label">✓ Total</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ habit.completion_rate }}%</div>
+                    <div class="stat-label">📊 Rate</div>
+                </div>
+            </div>
+            
+            <button class="complete-btn {% if habit.id in today_completions %}completed{% endif %}" 
+                    onclick="toggleHabit({{ habit.id }}, this)">
+                <span class="checkmark">{% if habit.id in today_completions %}✓{% else %}○{% endif %}</span>
+                <span class="text">{% if habit.id in today_completions %}Completed Today!{% else %}Complete Today{% endif %}</span>
+            </button>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="empty-icon">🔥</div>
+            <h2>No habits yet</h2>
+            <p>Create your first habit to start building consistency!</p>
+            <a href="{% url 'habit_create' %}" class="btn btn-primary" style="margin-top: 1.5rem;">
+                ➕ Create Habit
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.habits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.habit-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+}
+
+.habit-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    transform: translateY(-4px);
+}
+
+.habit-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.habit-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.habit-info h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.habit-info p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.habit-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.complete-btn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+.complete-btn:hover {
+    background: var(--bg-card);
+    border-color: var(--primary);
+}
+
+.complete-btn.completed {
+    background: linear-gradient(135deg, var(--success), #059669);
+    border-color: var(--success);
+    color: white;
+}
+
+.complete-btn .checkmark {
+    font-size: 1.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+</style>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function toggleHabit(habitId, button) {
+    fetch(`/habits/${habitId}/toggle/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.completed) {
+            button.classList.add('completed');
+            button.querySelector('.checkmark').textContent = '✓';
+            button.querySelector('.text').textContent = 'Completed Today!';
+        } else {
+            button.classList.remove('completed');
+            button.querySelector('.checkmark').textContent = '○';
+            button.querySelector('.text').textContent = 'Complete Today';
+        }
+        // Reload to update streak
+        setTimeout(() => location.reload(), 500);
+    });
+}
+</script>
+{% endblock %}
