@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Task Lists - FlowHub{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Task Lists</h1>
+        <p class="page-subtitle">Group your tasks into projects or categories</p>
+    </div>
+    <a href="{% url 'tasklist_create' %}" class="btn btn-primary">
+        {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+        New List
+    </a>
+</div>
+
+<div class="grid grid-3 mb-12">
+    {% for list in lists %}
+    <div class="card flex flex-col justify-between">
+        <div>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
+                    {% if list.icon %}
+                        {% include "includes/heroicon.html" with icon_name=list.icon class="icon-md" %}
+                    {% else %}
+                        {% include "includes/heroicon.html" with icon_name="list-bullet" class="icon-md" %}
+                    {% endif %}
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg leading-none">{{ list.name }}</h3>
+                    <span class="text-sm text-gray-500">{{ list.tasks.count }} tasks</span>
+                </div>
+            </div>
+            {% if list.description %}
+                <p class="text-sm text-gray-400 line-clamp-2 mb-4">{{ list.description }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-800">
+            <a href="{% url 'tasklist_detail' list.pk %}" class="text-sm text-primary hover:underline">Open list</a>
+            <div class="flex gap-2">
+                <a href="{% url 'tasklist_update' list.pk %}" class="text-gray-400 hover:text-white transition-colors">
+                    {% include "includes/heroicon.html" with icon_name="pencil" class="icon-sm" %}
+                </a>
+                <a href="{% url 'tasklist_archive' list.pk %}" class="text-gray-400 hover:text-warning transition-colors">
+                    {% include "includes/heroicon.html" with icon_name="archive-box" class="icon-sm" %}
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12 card">
+        {% include "includes/heroicon.html" with icon_name="list-bullet" class="icon-xl mx-auto mb-4 text-gray-600" %}
+        <p class="text-gray-400">No active task lists yet.</p>
+        <a href="{% url 'tasklist_create' %}" class="btn btn-primary mt-4">Create Your First List</a>
+    </div>
+    {% endfor %}
+</div>
+
+{% if archived_lists %}
+<div class="mb-6">
+    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+        {% include "includes/heroicon.html" with icon_name="archive-box" class="icon-md text-gray-500" %}
+        Archived Lists
+    </h2>
+    <div class="grid grid-3">
+        {% for list in archived_lists %}
+        <div class="card opacity-60 grayscale-[0.5]">
+             <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    {% include "includes/heroicon.html" with icon_name=list.icon|default:"list-bullet" class="icon-md text-gray-500" %}
+                    <span class="font-semibold">{{ list.name }}</span>
+                </div>
+                <span class="text-xs text-gray-500">Archived {{ list.archived_at|date:"M d" }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

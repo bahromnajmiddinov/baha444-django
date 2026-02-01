@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}List: {{ list.name }} - FlowHub{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+            {% if list.icon %}
+                {% include "includes/heroicon.html" with icon_name=list.icon class="icon-lg" %}
+            {% else %}
+                {% include "includes/heroicon.html" with icon_name="list-bullet" class="icon-lg" %}
+            {% endif %}
+        </div>
+        <div>
+            <h1 class="page-title">{{ list.name }}</h1>
+            <p class="page-subtitle">{{ list.description|default:"Task list" }} • {{ tasks.count }} tasks</p>
+        </div>
+    </div>
+    <div class="flex gap-2">
+        <a href="{% url 'task_create' %}?list={{ list.id }}" class="btn btn-primary">
+            {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+            Add Task
+        </a>
+        <a href="{% url 'tasklist_update' list.pk %}" class="btn btn-secondary">
+            {% include "includes/heroicon.html" with icon_name="pencil" class="icon-sm" %}
+            Edit List
+        </a>
+    </div>
+</div>
+
+<div class="space-y-4">
+    {% for task in tasks %}
+        {% include "tasks/partials/task_card.html" with task=task %}
+    {% empty %}
+    <div class="text-center py-12 card">
+        {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-xl mx-auto mb-4 text-gray-600" %}
+        <p class="text-gray-400">No tasks in this list yet.</p>
+        <a href="{% url 'task_create' %}?list={{ list.id }}" class="btn btn-primary mt-4">Add First Task</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

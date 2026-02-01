@@ -13,6 +13,9 @@
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     
+    <!-- Heroicons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/outline/index.min.css">
+    
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -411,6 +414,25 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--border-hover);
         }
+
+        /* Icon Styles */
+        .icon-svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .icon-sm { width: 1rem; height: 1rem; }
+        .icon-md { width: 1.5rem; height: 1.5rem; }
+        .icon-lg { width: 2rem; height: 2rem; }
+        .icon-xl { width: 2.5rem; height: 2.5rem; }
+
+        .text-danger { color: var(--danger); }
+        .text-success { color: var(--success); }
+        .text-warning { color: var(--warning); }
+        .text-info { color: var(--info); }
+        .text-primary { color: var(--primary); }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -420,7 +442,9 @@
         {% if user.is_authenticated %}
         <aside class="sidebar">
             <div class="sidebar-logo">
-                <div class="sidebar-logo-icon">✨</div>
+                <div class="sidebar-logo-icon">
+                    {% include "includes/heroicon.html" with icon_name="sparkles" class="text-white" %}
+                </div>
                 <span class="sidebar-logo-text">FlowHub</span>
             </div>
             
@@ -428,43 +452,57 @@
                 <ul class="sidebar-nav">
                     <li class="sidebar-nav-item">
                         <a href="{% url 'dashboard' %}" class="sidebar-nav-link {% if request.path == '/' %}active{% endif %}">
-                            <span class="sidebar-nav-icon">🏠</span>
+                            <span class="sidebar-nav-icon">
+                                {% include "includes/heroicon.html" with icon_name="home" class="icon-sm" %}
+                            </span>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
                         <a href="{% url 'task_list' %}" class="sidebar-nav-link {% if 'tasks' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">✅</span>
+                            <span class="sidebar-nav-icon">
+                                {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-sm" %}
+                            </span>
                             <span>Tasks</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
                         <a href="{% url 'habit_list' %}" class="sidebar-nav-link {% if 'habits' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">🔥</span>
+                            <span class="sidebar-nav-icon">
+                                {% include "includes/heroicon.html" with icon_name="fire" class="icon-sm" %}
+                            </span>
                             <span>Habits</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
                         <a href="{% url 'pomodoro' %}" class="sidebar-nav-link {% if 'pomodoro' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">⏱️</span>
+                            <span class="sidebar-nav-icon">
+                                {% include "includes/heroicon.html" with icon_name="clock" class="icon-sm" %}
+                            </span>
                             <span>Pomodoro</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
                         <a href="{% url 'finance_dashboard' %}" class="sidebar-nav-link {% if 'finance' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">💰</span>
+                            <span class="sidebar-nav-icon">
+                                {% include "includes/heroicon.html" with icon_name="currency-dollar" class="icon-sm" %}
+                            </span>
                             <span>Finance</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
                         <a href="{% url 'note_list' %}" class="sidebar-nav-link {% if 'notes' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">📝</span>
+                            <span class="sidebar-nav-icon">
+                                {% include "includes/heroicon.html" with icon_name="document-text" class="icon-sm" %}
+                            </span>
                             <span>Notes</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
                         <a href="{% url 'tracker_dashboard' %}" class="sidebar-nav-link {% if 'tracker' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">📊</span>
+                            <span class="sidebar-nav-icon">
+                                {% include "includes/heroicon.html" with icon_name="chart-bar" class="icon-sm" %}
+                            </span>
                             <span>Daily Tracker</span>
                         </a>
                     </li>

@@ -271,10 +271,19 @@ def calendar_view(request):
             tasks_by_day[day] = []
         tasks_by_day[day].append(task)
 
+    import calendar
+    cal = calendar.monthcalendar(year, month)
+    
     context = {
         'year': year,
         'month': month,
+        'month_name': calendar.month_name[month],
         'tasks_by_day': tasks_by_day,
+        'calendar': cal,
+        'prev_month': month - 1 if month > 1 else 12,
+        'prev_year': year if month > 1 else year - 1,
+        'next_month': month + 1 if month < 12 else 1,
+        'next_year': year if month < 12 else year + 1,
     }
 
     return render(request, 'tasks/calendar.html', context)

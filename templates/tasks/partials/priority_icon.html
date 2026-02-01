@@ -1,0 +1,7 @@
+{% if priority == 'high' %}
+    {% include "includes/heroicon.html" with icon_name="fire" class="text-danger " %}
+{% elif priority == 'medium' %}
+    {% include "includes/heroicon.html" with icon_name="minus" class="text-warning " %}
+{% else %}
+    {% include "includes/heroicon.html" with icon_name="circle-small" class="text-info " %}
+{% endif %}

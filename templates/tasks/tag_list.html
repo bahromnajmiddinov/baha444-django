@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Tags - FlowHub{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Tags</h1>
+        <p class="page-subtitle">Organize your tasks with color-coded tags</p>
+    </div>
+    <a href="{% url 'tag_create' %}" class="btn btn-primary">
+        {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+        New Tag
+    </a>
+</div>
+
+<div class="grid grid-3">
+    {% for tag in tags %}
+    <div class="card flex flex-col justify-between" id="tag-{{ tag.id }}">
+        <div>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: {{ tag.color }}20; color: {{ tag.color }};">
+                    {% if tag.icon %}
+                        {% include "includes/heroicon.html" with icon_name=tag.icon class="icon-md" %}
+                    {% else %}
+                        {% include "includes/heroicon.html" with icon_name="tag" class="icon-md" %}
+                    {% endif %}
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg leading-none">{{ tag.name }}</h3>
+                    <span class="text-sm text-gray-500">{{ tag.task_count }} tasks</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-800">
+            <a href="{% url 'tag_detail' tag.pk %}" class="text-sm text-primary hover:underline">View tasks</a>
+            <div class="flex gap-2">
+                <a href="{% url 'tag_update' tag.pk %}" class="text-gray-400 hover:text-white transition-colors">
+                    {% include "includes/heroicon.html" with icon_name="pencil" class="icon-sm" %}
+                </a>
+                <a href="{% url 'tag_delete' tag.pk %}" class="text-gray-400 hover:text-danger transition-colors">
+                    {% include "includes/heroicon.html" with icon_name="trash" class="icon-sm" %}
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12 card">
+        {% include "includes/heroicon.html" with icon_name="tag" class="icon-xl mx-auto mb-4 text-gray-600" %}
+        <p class="text-gray-400">No tags created yet. Create your first tag to start organizing!</p>
+        <a href="{% url 'tag_create' %}" class="btn btn-primary mt-4">Create Tag</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

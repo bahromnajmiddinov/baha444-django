@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Tasks Dashboard - FlowHub{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Tasks Overview</h1>
+        <p class="page-subtitle">Welcome back! Here's what's on your plate.</p>
+    </div>
+    <div class="flex gap-2">
+        <a href="{% url 'task_create' %}" class="btn btn-primary">
+            {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+            New Task
+        </a>
+    </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="grid grid-4 mb-8">
+    <div class="stat-card">
+        <div class="stat-label">Total Tasks</div>
+        <div class="stat-value">{{ total_tasks }}</div>
+        <div class="stat-change positive">
+            {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-sm" %}
+            Active
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value">{{ completed_tasks }}</div>
+        <div class="stat-change positive">
+            {{ completion_percentage }}% overall
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value text-warning">{{ pending_tasks }}</div>
+        <div class="stat-change negative">
+            Need attention
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">High Priority</div>
+        <div class="stat-value text-danger">{{ high_priority_tasks }}</div>
+        <div class="stat-change negative">
+            {% include "includes/heroicon.html" with icon_name="fire" class="icon-sm" %}
+            Urgent
+        </div>
+    </div>
+</div>
+
+<!-- Progress Bar -->
+<div class="card mb-8">
+    <div class="flex justify-between items-center mb-2">
+        <span class="text-sm font-medium text-gray-400">Total Progress</span>
+        <span class="text-sm font-bold text-primary">{{ completion_percentage }}%</span>
+    </div>
+    <div class="w-full bg-gray-800 rounded-full h-4 overflow-hidden">
+        <div class="bg-primary h-full transition-all duration-1000 ease-out" style="width: {{ completion_percentage }}%"></div>
+    </div>
+</div>
+
+<div class="grid grid-2">
+    <!-- Today's Tasks -->
+    <div class="space-y-4">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+            {% include "includes/heroicon.html" with icon_name="calendar" class="icon-md text-primary" %}
+            Today's Tasks
+        </h2>
+        {% for task in tasks_today %}
+            {% include "tasks/partials/task_card.html" with task=task %}
+        {% empty %}
+            <div class="card py-8 text-center text-gray-500">
+                No tasks scheduled for today.
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="space-y-8">
+        <!-- Overdue Tasks -->
+        {% if overdue_count > 0 %}
+        <div class="space-y-4">
+            <h2 class="text-xl font-bold text-danger flex items-center gap-2">
+                {% include "includes/heroicon.html" with icon_name="exclamation-circle" class="icon-md" %}
+                Overdue ({{ overdue_count }})
+            </h2>
+            <div class="space-y-3">
+                {% for task in overdue_tasks %}
+                    <div class="card p-3 border-danger/20 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            {% include "tasks/partials/priority_icon.html" with priority=task.priority %}
+                            <a href="{% url 'task_detail' task.pk %}" class="font-medium hover:text-danger">{{ task.title }}</a>
+                        </div>
+                        <span class="text-xs text-danger font-bold">{{ task.due_date|date:"M d" }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Upcoming Tasks (7 days) -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-bold flex items-center gap-2">
+                {% include "includes/heroicon.html" with icon_name="clock" class="icon-md text-info" %}
+                Upcoming Week
+            </h2>
+            <div class="space-y-3">
+                {% for task in upcoming_tasks %}
+                    <div class="card p-3 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs text-gray-500 w-12">{{ task.due_date|date:"D" }}</span>
+                            <a href="{% url 'task_detail' task.pk %}" class="font-medium hover:text-primary">{{ task.title }}</a>
+                        </div>
+                        <span class="text-xs text-gray-500">{{ task.due_date|date:"M d" }}</span>
+                    </div>
+                {% empty %}
+                    <div class="card py-4 text-center text-gray-500 text-sm">
+                        No upcoming tasks in the next 7 days.
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Quick Add Widget -->
+        <div class="card bg-primary/5 border-primary/20">
+            <h3 class="font-bold mb-3 flex items-center gap-2">
+                {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+                Quick Add Task
+            </h3>
+            <form hx-post="{% url 'task_create' %}" hx-swap="none" class="space-y-3" onsubmit="this.reset()">
+                {% csrf_token %}
+                <input type="text" name="title" required placeholder="What needs to be done?" class="w-full bg-bg-tertiary border border-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary">
+                <button type="submit" class="btn btn-primary w-full justify-center py-2 text-xs">Add Task</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

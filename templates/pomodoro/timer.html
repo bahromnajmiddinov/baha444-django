@@ -2,23 +2,23 @@
 
 {% load math_filters %}
 
-{% block title %}Pomodoro Timer{% endblock %}
+{% block title %}Pomodoro Timer - FlowHub{% endblock %}
 
 {% block content %}
 <div class="pomodoro-container">
-    <div class="pomodoro-header">
-        <h1>⏱️ Focus Timer</h1>
-        <p>Time doesn't rush here. Stay focused.</p>
+    <div class="pomodoro-header mb-12 text-center">
+        <h1 class="text-4xl font-extrabold mb-2">Focus Timer</h1>
+        <p class="text-gray-500">Time doesn't rush here. Stay focused.</p>
     </div>
     
-    <div class="timer-main">
-        <div class="timer-display">
-            <div class="timer-ring">
-                <svg viewBox="0 0 200 200">
+    <div class="timer-main card p-12 mb-8 bg-bg-card/50 backdrop-blur-xl border-white/5">
+        <div class="timer-display relative w-[300px] h-[300px] mx-auto mb-12">
+            <div class="timer-ring w-full h-full">
+                <svg viewBox="0 0 200 200" class="w-full h-full">
                     <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(99, 102, 241, 0.1)" stroke-width="8"/>
                     <circle id="progress-ring" cx="100" cy="100" r="90" fill="none" stroke="url(#gradient)" stroke-width="8" 
                             stroke-linecap="round" transform="rotate(-90 100 100)" 
-                            stroke-dasharray="565.48" stroke-dashoffset="0"/>
+                            stroke-dasharray="565.48" stroke-dashoffset="0" class="transition-all duration-1000 ease-linear"/>
                     <defs>
                         <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
@@ -28,63 +28,75 @@
                 </svg>
             </div>
             
-            <div class="timer-content">
-                <div id="time-display" class="time">25:00</div>
-                <div id="session-label" class="session-type">Focus Time</div>
+            <div class="timer-content absolute inset-0 flex flex-col items-center justify-center">
+                <div id="time-display" class="time text-6xl font-black font-mono tracking-tighter">25:00</div>
+                <div id="session-label" class="session-type text-sm font-bold uppercase tracking-widest text-gray-500 mt-2">Focus Time</div>
             </div>
         </div>
         
-        <div class="timer-controls">
-            <button id="start-btn" class="control-btn primary" onclick="startTimer()">
-                <span class="btn-icon">▶</span>
+        <div class="timer-controls flex justify-center gap-4 mb-12">
+            <button id="start-btn" class="btn btn-primary px-10 py-4 rounded-2xl text-lg shadow-2xl shadow-primary/20" onclick="startTimer()">
+                {% include "includes/heroicon.html" with icon_name="plus" class="icon-md rotate-[315deg]" %}
                 <span>Start</span>
             </button>
-            <button id="pause-btn" class="control-btn" onclick="pauseTimer()" style="display: none;">
-                <span class="btn-icon">⏸</span>
+            <button id="pause-btn" class="btn btn-primary px-10 py-4 rounded-2xl text-lg" onclick="pauseTimer()" style="display: none;">
+                {% include "includes/heroicon.html" with icon_name="minus" class="icon-md rotate-90" %}
                 <span>Pause</span>
             </button>
-            <button id="reset-btn" class="control-btn secondary" onclick="resetTimer()">
-                <span class="btn-icon">↻</span>
+            <button id="reset-btn" class="btn btn-secondary px-8 py-4 rounded-2xl" onclick="resetTimer()">
+                {% include "includes/heroicon.html" with icon_name="clock" class="icon-md" %}
                 <span>Reset</span>
             </button>
         </div>
         
-        <div class="session-selector">
+        <div class="session-selector grid grid-cols-3 gap-4">
             <button class="session-btn active" data-duration="25" data-type="focus" onclick="selectSession(this)">
-                <span class="session-icon">🎯</span>
-                <span>Focus</span>
-                <span class="session-time">25 min</span>
+                <div class="p-3 bg-primary/10 rounded-xl mb-3 text-primary">
+                    {% include "includes/heroicon.html" with icon_name="fire" class="icon-lg" %}
+                </div>
+                <span class="font-bold">Focus</span>
+                <span class="text-xs text-gray-500">25 min</span>
             </button>
             <button class="session-btn" data-duration="5" data-type="short_break" onclick="selectSession(this)">
-                <span class="session-icon">☕</span>
-                <span>Short Break</span>
-                <span class="session-time">5 min</span>
+                <div class="p-3 bg-success/10 rounded-xl mb-3 text-success">
+                    {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-lg" %}
+                </div>
+                <span class="font-bold">Short Break</span>
+                <span class="text-xs text-gray-500">5 min</span>
             </button>
             <button class="session-btn" data-duration="15" data-type="long_break" onclick="selectSession(this)">
-                <span class="session-icon">🌴</span>
-                <span>Long Break</span>
-                <span class="session-time">15 min</span>
+                <div class="p-3 bg-info/10 rounded-xl mb-3 text-info">
+                    {% include "includes/heroicon.html" with icon_name="calendar" class="icon-lg" %}
+                </div>
+                <span class="font-bold">Long Break</span>
+                <span class="text-xs text-gray-500">15 min</span>
             </button>
         </div>
     </div>
     
     <div class="stats-section">
-        <h2>Today's Sessions</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">🎯</div>
-                <div class="stat-value">{{ recent_sessions|length }}</div>
-                <div class="stat-label">Completed</div>
+        <h2 class="text-2xl font-bold mb-6">Today's Sessions</h2>
+        <div class="stats-grid grid grid-cols-3 gap-6">
+            <div class="stat-card card text-center p-6">
+                <div class="stat-icon text-primary flex justify-center mb-4">
+                    {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-xl" %}
+                </div>
+                <div class="stat-value text-3xl font-black mb-1">{{ recent_sessions|length }}</div>
+                <div class="stat-label text-xs uppercase font-bold text-gray-500 tracking-wider">Completed</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">⏱️</div>
-                <div class="stat-value">{{ recent_sessions|length|multiply:25 }}</div>
-                <div class="stat-label">Minutes</div>
+            <div class="stat-card card text-center p-6">
+                <div class="stat-icon text-info flex justify-center mb-4">
+                    {% include "includes/heroicon.html" with icon_name="clock" class="icon-xl" %}
+                </div>
+                <div class="stat-value text-3xl font-black mb-1">{{ recent_sessions|length|multiply:25 }}</div>
+                <div class="stat-label text-xs uppercase font-bold text-gray-500 tracking-wider">Minutes</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">🔥</div>
-                <div class="stat-value">{{ recent_sessions|length|divide:4 }}</div>
-                <div class="stat-label">Cycles</div>
+            <div class="stat-card card text-center p-6">
+                <div class="stat-icon text-accent flex justify-center mb-4">
+                    {% include "includes/heroicon.html" with icon_name="star" class="icon-xl" %}
+                </div>
+                <div class="stat-value text-3xl font-black mb-1">{{ recent_sessions|length|divide:4 }}</div>
+                <div class="stat-label text-xs uppercase font-bold text-gray-500 tracking-wider">Cycles</div>
             </div>
         </div>
     </div>
@@ -92,213 +104,30 @@
 
 <style>
 .pomodoro-container {
-    max-width: 900px;
+    max-width: 800px;
     margin: 0 auto;
-}
-
-.pomodoro-header {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.pomodoro-header h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-}
-
-.pomodoro-header p {
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-}
-
-.timer-main {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 3rem;
-    margin-bottom: 2rem;
-}
-
-.timer-display {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    margin: 0 auto 3rem;
-}
-
-.timer-ring {
-    width: 100%;
-    height: 100%;
-}
-
-.timer-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-}
-
-.time {
-    font-size: 4rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    font-family: 'Space Mono', monospace;
-    color: var(--text-primary);
-}
-
-.session-type {
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-    margin-top: 0.5rem;
-    font-weight: 600;
-}
-
-.timer-controls {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-bottom: 2rem;
-}
-
-.control-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
-}
-
-.control-btn.primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
-}
-
-.control-btn.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
-}
-
-.control-btn.secondary {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-}
-
-.control-btn.secondary:hover {
-    background: var(--bg-secondary);
-}
-
-.btn-icon {
-    font-size: 1.2rem;
-}
-
-.session-selector {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
 }
 
 .session-btn {
     background: var(--bg-tertiary);
     border: 2px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
+    border-radius: 20px;
+    padding: 1.5rem;
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--text-primary);
-    font-family: inherit;
 }
 
 .session-btn:hover {
-    background: var(--bg-card);
     border-color: var(--primary);
+    background: var(--bg-card);
 }
 
 .session-btn.active {
-    background: rgba(99, 102, 241, 0.15);
+    background: rgba(99, 102, 241, 0.05);
     border-color: var(--primary);
-}
-
-.session-icon {
-    font-size: 2rem;
-}
-
-.session-time {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-.stats-section h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-}
-
-.stat-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.5rem;
-    text-align: center;
-}
-
-.stat-icon {
-    font-size: 2.5rem;
-    margin-bottom: 0.75rem;
-}
-
-.stat-value {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--text-primary);
-}
-
-.stat-label {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
-
-@media (max-width: 768px) {
-    .timer-main {
-        padding: 2rem 1.5rem;
-    }
-    
-    .timer-display {
-        width: 250px;
-        height: 250px;
-    }
-    
-    .time {
-        font-size: 3rem;
-    }
-    
-    .session-selector {
-        grid-template-columns: 1fr;
-    }
-    
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
 }
 </style>
 
@@ -388,7 +217,7 @@ function completeSession() {
         })
     });
     
-    alert('🎉 Session completed! Great work!');
+    alert('Session completed! Great work!');
     resetTimer();
 }
 

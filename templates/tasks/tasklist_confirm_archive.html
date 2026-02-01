@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Archive List: {{ list.name }} - FlowHub{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto py-12">
+    <div class="card border-warning/20">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-warning/10 text-warning rounded-full flex items-center justify-center mx-auto mb-4">
+                {% include "includes/heroicon.html" with icon_name="archive-box" class="icon-lg" %}
+            </div>
+            <h1 class="text-2xl font-bold">Archive List</h1>
+            <p class="text-gray-400 mt-2">Are you sure you want to archive the list "<span class="text-white font-semibold">{{ list.name }}</span>"?</p>
+            <p class="text-sm text-gray-500 mt-4">Archived lists are hidden from the main view but can still be accessed later.</p>
+        </div>
+
+        <form method="post" class="flex flex-col gap-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary bg-warning hover:bg-warning/80 w-full justify-center">
+                Yes, Archive List
+            </button>
+            <a href="{% url 'tasklist_list' %}" class="btn btn-secondary w-full justify-center">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
