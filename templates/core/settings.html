@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings - FlowHub{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Settings</h1>
+        <p class="page-subtitle">Customize your FlowHub experience</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <h2 class="text-xl font-semibold mb-6">Appearance</h2>
+        
+        <form method="post" action="{% url 'settings' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label">Theme</label>
+                <div class="space-y-3">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="radio" name="theme" value="light" 
+                               {% if request.user.profile.theme == 'light' %}checked{% endif %}
+                               onchange="ThemeManager.setTheme('light')">
+                        <span>Light</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="radio" name="theme" value="dark" 
+                               {% if request.user.profile.theme == 'dark' %}checked{% endif %}
+                               onchange="ThemeManager.setTheme('dark')">
+                        <span>Dark</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="radio" name="theme" value="system" 
+                               {% if request.user.profile.theme == 'system' %}checked{% endif %}
+                               onchange="ThemeManager.setTheme('system')">
+                        <span>System</span>
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
