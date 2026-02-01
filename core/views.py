@@ -4,6 +4,10 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db.models import Count, Sum, Q
 from django.utils import timezone
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+import json
 from datetime import datetime, timedelta
 from tasks.models import Task
 from habits.models import Habit, HabitCompletion
@@ -128,3 +132,41 @@ def register_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+@login_required
+def settings_view(request):
+    """User settings page."""
+    if request.method == 'POST':
+        theme = request.POST.get('theme')
+        if theme in ['light', 'dark', 'system']:
+            profile = request.user.profile
+            profile.theme = theme
+            profile.save()
+            
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'theme': theme})
+            else:
+                return redirect('settings')
+    
+    return render(request, 'core/settings.html')
+
+
+@login_required
+@require_http_methods(["POST"])
+def set_theme(request):
+    """API endpoint to set user theme preference."""
+    try:
+        data = json.loads(request.body)
+        theme = data.get('theme')
+        
+        if theme not in ['light', 'dark', 'system']:
+            return JsonResponse({'success': False, 'error': 'Invalid theme'}, status=400)
+        
+        profile = request.user.profile
+        profile.theme = theme
+        profile.save()
+        
+        return JsonResponse({'success': True, 'theme': theme})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)

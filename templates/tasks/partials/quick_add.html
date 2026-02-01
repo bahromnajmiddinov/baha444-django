@@ -1,0 +1,19 @@
+<div class="quick-add" hx-post="{% url 'task_create' %}" hx-swap="none">
+    <input type="checkbox" class="task-checkbox" disabled style="opacity: 0.3;">
+    <input type="text" name="title" class="quick-add-input" 
+           placeholder="Add a task..."
+           hx-trigger="keydown[keyCode==13]" 
+           hx-post="{% url 'task_create' %}"
+           hx-target="body">
+    <div class="quick-add-actions">
+        <button type="button" class="btn btn-ghost btn-sm" title="Set due date">
+            {% include "includes/heroicon.html" with icon_name="calendar" class="icon-sm" %}
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" hx-trigger="click" 
+                hx-post="{% url 'task_create' %}" 
+                hx-include="[name='title']"
+                hx-target="body">
+            Add
+        </button>
+    </div>
+</div>

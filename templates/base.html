@@ -1,15 +1,10 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Productivity Hub{% endblock %}</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>{% block title %}FlowHub{% endblock %}</title>
     
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
@@ -24,79 +19,210 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     
     {% block extra_css %}{% endblock %}
+    
+    <style>
+        /* Light Theme (Default) */
+        html[data-theme="light"] {
+            --primary: #d33682;
+            --primary-light: #f5e6eb;
+            --secondary: #3498db;
+            --secondary-light: #e3f2fd;
+            --success: #27ae60;
+            --success-light: #e8f5e9;
+            --warning: #f39c12;
+            --warning-light: #fff3e0;
+            --danger: #e74c3c;
+            --danger-light: #ffebee;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #f0f0f0;
+            --bg-card: #ffffff;
+            
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --text-muted: #95a5a6;
+            
+            --border: #e0e0e0;
+            --border-hover: #d0d0d0;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* Dark Theme */
+        html[data-theme="dark"] {
+            --primary: #ef4444;
+            --primary-light: #3f1c1c;
+            --secondary: #3b82f6;
+            --secondary-light: #1e293b;
+            --success: #10b981;
+            --success-light: #064e3b;
+            --warning: #f59e0b;
+            --warning-light: #3f2a1b;
+            --danger: #dc2626;
+            --danger-light: #3f1c1c;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1e293b;
+            
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            
+            --border: #475569;
+            --border-hover: #64748b;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.6);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* Typography */
+        h1 { font-size: 1.875rem; font-weight: 700; line-height: 1.2; }
+        h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
+        h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.4; }
+        h4 { font-size: 1.125rem; font-weight: 600; line-height: 1.4; }
+        h5 { font-size: 1rem; font-weight: 600; line-height: 1.5; }
+        h6 { font-size: 0.875rem; font-weight: 600; line-height: 1.5; }
+        
+        p { font-size: 0.95rem; margin-bottom: 1rem; }
+        
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        a:hover { color: var(--primary); opacity: 0.8; }
+        
+        /* Cards - Very subtle */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        .card:hover {
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* No heavy shadows - minimal approach */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .section {
+            padding: 2rem 0;
+        }
+        
+        /* Whitespace & spacing */
+        .space-sm { margin-bottom: 0.75rem; }
+        .space-md { margin-bottom: 1.5rem; }
+        .space-lg { margin-bottom: 2rem; }
+        .space-xl { margin-bottom: 3rem; }
+    </style>
 </head>
-<body>
+<body data-csrftoken="{{ csrf_token }}" data-user-id="{% if user.is_authenticated %}{{ user.id }}{% endif %}">
     <a href="#main-content" class="skip-to-main">Skip to main content</a>
     <div class="app-container">
         {% if user.is_authenticated %}
         <aside class="sidebar">
-            <div class="sidebar-logo">
-                <div class="sidebar-logo-icon">
-                    {% include "includes/heroicon.html" with icon_name="sparkles" class="text-white" %}
-                </div>
-                <span class="sidebar-logo-text">FlowHub</span>
+            <div class="sidebar-header">
+                <h1 class="logo">FlowHub</h1>
+                <button class="theme-toggle" onclick="ThemeManager.toggle()">
+                    {% include "includes/heroicon.html" with icon_name="moon" class="icon-sm" %}
+                </button>
             </div>
             
-            <nav>
-                <ul class="sidebar-nav">
-                    <li class="sidebar-nav-item">
-                        <a href="{% url 'dashboard' %}" class="sidebar-nav-link {% if request.path == '/' %}active{% endif %}">
-                            <span class="sidebar-nav-icon">
-                                {% include "includes/heroicon.html" with icon_name="home" class="icon-sm" %}
-                            </span>
-                            <span>Dashboard</span>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Main</h3>
+                    <ul class="nav-menu">
+                        <li><a href="{% url 'dashboard' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                            <span class="nav-icon">{% include "includes/heroicon.html" with icon_name="calendar" %}</span>
+                            <span>Today</span>
+                        </a></li>
+                        <li><a href="{% url 'task_list' %}" class="nav-link {% if 'tasks' in request.path and 'list' not in request.path and 'tag' not in request.path %}active{% endif %}">
+                            <span class="nav-icon">{% include "includes/heroicon.html" with icon_name="list-bullet" %}</span>
+                            <span>All Tasks</span>
+                        </a></li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-header">
+                        <h3 class="nav-section-title">Lists</h3>
+                        <a href="{% url 'tasklist_create' %}" class="nav-add-btn">
+                            {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
                         </a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a href="{% url 'task_list' %}" class="sidebar-nav-link {% if 'tasks' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">
-                                {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-sm" %}
-                            </span>
-                            <span>Tasks</span>
+                    </div>
+                    <ul class="nav-menu">
+                        {% for list in user_task_lists %}
+                        <li><a href="{% url 'tasklist_detail' list.id %}" class="nav-link {% if request.path|slice:":-1" == list.id|stringformat:"s" %}active{% endif %}">
+                            <span class="nav-icon">{% include "includes/heroicon.html" with icon_name=list.icon|default:"list" %}</span>
+                            <span>{{ list.name }}</span>
+                        </a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-header">
+                        <h3 class="nav-section-title">Tags</h3>
+                        <a href="{% url 'tag_create' %}" class="nav-add-btn">
+                            {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
                         </a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a href="{% url 'habit_list' %}" class="sidebar-nav-link {% if 'habits' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">
-                                {% include "includes/heroicon.html" with icon_name="fire" class="icon-sm" %}
-                            </span>
-                            <span>Habits</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a href="{% url 'pomodoro' %}" class="sidebar-nav-link {% if 'pomodoro' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">
-                                {% include "includes/heroicon.html" with icon_name="clock" class="icon-sm" %}
-                            </span>
-                            <span>Pomodoro</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a href="{% url 'finance_dashboard' %}" class="sidebar-nav-link {% if 'finance' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">
-                                {% include "includes/heroicon.html" with icon_name="currency-dollar" class="icon-sm" %}
-                            </span>
-                            <span>Finance</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a href="{% url 'note_list' %}" class="sidebar-nav-link {% if 'notes' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">
-                                {% include "includes/heroicon.html" with icon_name="document-text" class="icon-sm" %}
-                            </span>
-                            <span>Notes</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a href="{% url 'tracker_dashboard' %}" class="sidebar-nav-link {% if 'tracker' in request.path %}active{% endif %}">
-                            <span class="sidebar-nav-icon">
-                                {% include "includes/heroicon.html" with icon_name="chart-bar" class="icon-sm" %}
-                            </span>
-                            <span>Daily Tracker</span>
-                        </a>
-                    </li>
-                </ul>
+                    </div>
+                    <ul class="nav-tags">
+                        {% for tag in user_tags %}
+                        <li><a href="{% url 'tag_detail' tag.id %}" class="nav-tag-link" style="--tag-color: {{ tag.color }};">
+                            <span class="tag-dot"></span>
+                            <span>{{ tag.name }}</span>
+                        </a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </nav>
+            
+            <div class="sidebar-footer">
+                <a href="{% url 'settings' %}" class="nav-link">
+                    <span class="nav-icon">{% include "includes/heroicon.html" with icon_name="cog-6-tooth" %}</span>
+                    <span>Settings</span>
+                </a>
+            </div>
         </aside>
         {% endif %}
         
@@ -106,5 +232,70 @@
     </div>
     
     {% block extra_js %}{% endblock %}
+    
+    <script>
+        // Theme Management
+        const ThemeManager = {
+            init() {
+                // Get theme from localStorage, then user profile, then system preference
+                let savedTheme = localStorage.getItem('theme');
+                
+                // If no localStorage theme and user has a profile theme, use that
+                if (!savedTheme && document.body.dataset.userId) {
+                    // We'll set this from the server-side context
+                    const profileTheme = '{{ request.user.profile.theme|default:"light" }}';
+                    if (profileTheme && profileTheme !== 'system') {
+                        savedTheme = profileTheme;
+                    }
+                }
+                
+                // If system theme, check system preference
+                if (!savedTheme && window.matchMedia) {
+                    savedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                
+                this.setTheme(savedTheme || 'light');
+                
+                // Listen for system preference changes
+                if (window.matchMedia) {
+                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                        if (!localStorage.getItem('theme')) {
+                            this.setTheme(e.matches ? 'dark' : 'light');
+                        }
+                    });
+                }
+            },
+            
+            setTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                
+                // Sync with server if user is authenticated
+                if (document.body.dataset.userId) {
+                    fetch('/api/theme/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.body.dataset.csrftoken
+                        },
+                        body: JSON.stringify({ theme })
+                    }).catch(console.error);
+                }
+            },
+            
+            toggle() {
+                const current = document.documentElement.getAttribute('data-theme') || 'light';
+                this.setTheme(current === 'light' ? 'dark' : 'light');
+            }
+        };
+        
+        ThemeManager.init();
+        
+        // Apply theme on page load after DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme is already applied by init() above
+            console.log('FlowHub theme:', document.documentElement.getAttribute('data-theme'));
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}All Tasks - FlowHub{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">All Tasks</h1>
+        <p class="page-subtitle">{% if tasks|length > 0 %}{{ tasks|length }} {% endif %}tasks</p>
+    </div>
+    <a href="{% url 'task_create' %}" class="btn btn-primary">
+        {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+        Add Task
+    </a>
+</div>
+
+<div class="container">
+    <!-- Quick Add Widget -->
+    {% include "tasks/partials/quick_add.html" %}
+    
+    <!-- Task List -->
+    <div class="card space-y-3">
+        {% for task in tasks %}
+        <div class="task-item {% if task.is_overdue %}overdue{% endif %} {% if task.status == 'completed' %}completed{% endif %} priority-{{ task.priority }}">
+            <div class="task-checkbox">
+                <input type="checkbox" {% if task.status == 'completed' %}checked{% endif %} 
+                       hx-post="{% url 'task_update_status' task.id %}" 
+                       hx-trigger="click"
+                       hx-target="body">
+            </div>
+            
+            <div class="task-content">
+                <h3 class="task-title">{{ task.title }}</h3>
+                {% if task.description %}
+                <p class="task-description">{{ task.description|truncatewords:15 }}</p>
+                {% endif %}
+                
+                <div class="task-meta">
+                    {% if task.task_list %}
+                    <span class="badge">{{ task.task_list.name }}</span>
+                    {% endif %}
+                    
+                    {% for tag in task.tags.all %}
+                    <span class="tag-badge" style="--tag-color: {{ tag.color }}; border-color: {{ tag.color }}; color: {{ tag.color }};">
+                        {{ tag.name }}
+                    </span>
+                    {% endfor %}
+                    
+                    {% if task.due_date %}
+                    <span class="badge {% if task.is_overdue %}danger{% endif %}">
+                        {{ task.due_date|date:"M d" }}
+                    </span>
+                    {% endif %}
+                    
+                    <span class="badge {% if task.priority == 'high' %}danger{% elif task.priority == 'medium' %}warning{% else %}secondary{% endif %}">
+                        {{ task.priority|title }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="task-actions">
+                <a href="{% url 'task_detail' task.id %}" class="btn btn-ghost btn-sm" title="View details">
+                    {% include "includes/heroicon.html" with icon_name="eye" class="icon-sm" %}
+                </a>
+                <a href="{% url 'task_update' task.id %}" class="btn btn-ghost btn-sm" title="Edit">
+                    {% include "includes/heroicon.html" with icon_name="pencil" class="icon-sm" %}
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-12 text-gray-500">
+            {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-xl mx-auto mb-4 opacity-20" %}
+            <p class="font-semibold">No tasks yet</p>
+            <p class="text-sm">Add your first task to get started!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
