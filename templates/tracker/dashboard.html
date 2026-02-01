@@ -1,72 +1,97 @@
 {% extends 'base.html' %}
 
-{% block title %}Daily Tracker{% endblock %}
+{% block title %}Daily Tracker - FlowHub{% endblock %}
 
 {% block content %}
 <div class="page-header">
     <div>
-        <h1 class="page-title">📊 Daily Tracker</h1>
+        <h1 class="page-title">Daily Tracker</h1>
         <p class="page-subtitle">Track your mood, habits, and daily progress</p>
     </div>
-    <div style="color: var(--text-secondary); font-size: 1rem;">
+    <div class="flex items-center gap-2 text-gray-500 font-semibold bg-white/5 px-4 py-2 rounded-xl">
+        {% include "includes/heroicon.html" with icon_name="calendar" class="icon-sm" %}
         {{ today|date:"l, F d, Y" }}
     </div>
 </div>
 
-<div class="grid grid-2">
-    <div class="card">
-        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">How are you feeling? 😊</h2>
-        <div style="display: flex; justify-content: space-around; margin-bottom: 2rem;">
+<div class="grid grid-2 gap-8">
+    <div class="card p-8">
+        <h2 class="text-2xl font-bold mb-8 flex items-center gap-2">
+            {% include "includes/heroicon.html" with icon_name="sparkles" class="icon-md text-accent" %}
+            How are you feeling?
+        </h2>
+        <div class="flex justify-around mb-12">
             {% for mood_val, mood_label in daily_entry.MOOD_CHOICES %}
-            <button class="mood-btn {% if daily_entry.mood == mood_val %}active{% endif %}" 
-                    style="font-size: 3rem; background: {% if daily_entry.mood == mood_val %}rgba(99, 102, 241, 0.15){% else %}var(--bg-tertiary){% endif %}; 
-                    border: 2px solid {% if daily_entry.mood == mood_val %}var(--primary){% else %}transparent{% endif %}; 
-                    padding: 1rem; border-radius: 12px; cursor: pointer; transition: all 0.2s;">
-                {{ mood_label|slice:":2" }}
+            <button class="mood-btn group transition-all duration-300 {% if daily_entry.mood == mood_val %}active scale-110{% endif %}">
+                <div class="p-6 rounded-2xl bg-bg-tertiary border-2 transition-all group-hover:bg-white/5 
+                    {% if daily_entry.mood == mood_val %}border-primary bg-primary/10 shadow-lg shadow-primary/20{% else %}border-transparent{% endif %}">
+                    <span class="text-4xl">{{ mood_label|slice:":2" }}</span>
+                </div>
             </button>
             {% endfor %}
         </div>
         
-        <h3 style="font-weight: 600; margin-bottom: 0.75rem;">Morning Notes</h3>
-        <textarea placeholder="How's your day starting? What are your intentions?" 
-            style="width: 100%; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
-            border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical; min-height: 100px; margin-bottom: 1.5rem;">{{ daily_entry.morning_notes }}</textarea>
-        
-        <h3 style="font-weight: 600; margin-bottom: 0.75rem;">Evening Reflection</h3>
-        <textarea placeholder="How did your day go? What did you learn?" 
-            style="width: 100%; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
-            border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical; min-height: 100px;">{{ daily_entry.evening_notes }}</textarea>
+        <div class="space-y-6">
+            <div>
+                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
+                    {% include "includes/heroicon.html" with icon_name="clock" class="icon-sm" %}
+                    Morning Notes
+                </h3>
+                <textarea placeholder="How's your day starting? What are your intentions?" 
+                    class="w-full p-4 bg-bg-tertiary border border-border rounded-xl text-white focus:outline-none focus:border-primary resize-none min-h-[120px]">{{ daily_entry.morning_notes }}</textarea>
+            </div>
+            
+            <div>
+                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
+                    {% include "includes/heroicon.html" with icon_name="clock" class="icon-sm" %}
+                    Evening Reflection
+                </h3>
+                <textarea placeholder="How did your day go? What did you learn?" 
+                    class="w-full p-4 bg-bg-tertiary border border-border rounded-xl text-white focus:outline-none focus:border-primary resize-none min-h-[120px]">{{ daily_entry.evening_notes }}</textarea>
+            </div>
+        </div>
     </div>
     
-    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-        <div class="card">
-            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Today's Wins 🎉</h2>
+    <div class="flex flex-col gap-8">
+        <div class="card p-6 border-success/10 bg-success/5">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-success">
+                {% include "includes/heroicon.html" with icon_name="star" class="icon-md" %}
+                Today's Wins
+            </h2>
             <textarea placeholder="What went well today? Celebrate your wins!" 
-                style="width: 100%; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
-                border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical; min-height: 100px;">{{ daily_entry.wins }}</textarea>
+                class="w-full p-4 bg-bg-tertiary border border-border rounded-xl text-white focus:outline-none focus:border-success resize-none min-h-[100px]">{{ daily_entry.wins }}</textarea>
         </div>
         
-        <div class="card">
-            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Gratitude 🙏</h2>
+        <div class="card p-6 border-primary/10 bg-primary/5">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-primary">
+                {% include "includes/heroicon.html" with icon_name="fire" class="icon-md" %}
+                Gratitude
+            </h2>
             <textarea placeholder="What are you grateful for today?" 
-                style="width: 100%; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
-                border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical; min-height: 100px;">{{ daily_entry.gratitude }}</textarea>
+                class="w-full p-4 bg-bg-tertiary border border-border rounded-xl text-white focus:outline-none focus:border-primary resize-none min-h-[100px]">{{ daily_entry.gratitude }}</textarea>
         </div>
         
-        <div class="card">
-            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Quick Metrics</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-secondary); font-size: 0.875rem;">💧 Water (glasses)</label>
-                    <input type="number" value="{{ daily_entry.water_intake }}" min="0" max="20"
-                        style="width: 100%; padding: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
-                        border-radius: 8px; color: var(--text-primary); font-size: 1.5rem; font-weight: 700; text-align: center;">
+        <div class="card p-6">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                {% include "includes/heroicon.html" with icon_name="chart-bar" class="icon-md text-info" %}
+                Quick Metrics
+            </h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="p-4 bg-bg-tertiary rounded-xl border border-border">
+                    <label class="block mb-2 font-bold text-gray-500 text-xs uppercase tracking-widest">Water (glasses)</label>
+                    <div class="flex items-center gap-3">
+                        {% include "includes/heroicon.html" with icon_name="plus" class="icon-md text-info rotate-180" %}
+                        <input type="number" value="{{ daily_entry.water_intake }}" min="0" max="20"
+                            class="bg-transparent text-2xl font-black w-full text-center focus:outline-none">
+                    </div>
                 </div>
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-secondary); font-size: 0.875rem;">🏃 Exercise (min)</label>
-                    <input type="number" value="{{ daily_entry.exercise_minutes }}" min="0"
-                        style="width: 100%; padding: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
-                        border-radius: 8px; color: var(--text-primary); font-size: 1.5rem; font-weight: 700; text-align: center;">
+                <div class="p-4 bg-bg-tertiary rounded-xl border border-border">
+                    <label class="block mb-2 font-bold text-gray-500 text-xs uppercase tracking-widest">Exercise (min)</label>
+                    <div class="flex items-center gap-3">
+                        {% include "includes/heroicon.html" with icon_name="fire" class="icon-md text-orange-500" %}
+                        <input type="number" value="{{ daily_entry.exercise_minutes }}" min="0"
+                            class="bg-transparent text-2xl font-black w-full text-center focus:outline-none">
+                    </div>
                 </div>
             </div>
         </div>
@@ -74,8 +99,9 @@
 </div>
 
 <style>
-.mood-btn:hover {
-    transform: scale(1.1);
+.mood-btn:hover .p-6 {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
 }
 </style>
 {% endblock %}

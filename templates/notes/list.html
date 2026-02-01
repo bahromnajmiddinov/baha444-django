@@ -1,14 +1,17 @@
 {% extends 'base.html' %}
 
-{% block title %}Notes{% endblock %}
+{% block title %}Notes - FlowHub{% endblock %}
 
 {% block content %}
 <div class="page-header">
     <div>
-        <h1 class="page-title">📝 Notes</h1>
+        <h1 class="page-title">Notes</h1>
         <p class="page-subtitle">Capture your thoughts and ideas</p>
     </div>
-    <a href="{% url 'note_create' %}" class="btn btn-primary">➕ New Note</a>
+    <a href="{% url 'note_create' %}" class="btn btn-primary">
+        {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+        New Note
+    </a>
 </div>
 
 <div class="notes-masonry">
@@ -16,16 +19,19 @@
         {% for note in notes %}
         <div class="note-card" onclick="window.location.href='{% url 'note_detail' note.id %}'">
             {% if note.is_pinned %}
-            <div class="pin-badge">📌 Pinned</div>
+            <div class="pin-badge flex items-center gap-1 w-fit mb-3">
+                {% include "includes/heroicon.html" with icon_name="star" class="icon-sm text-accent" %}
+                <span>Pinned</span>
+            </div>
             {% endif %}
-            <h3>{{ note.title }}</h3>
-            <p>{{ note.content|truncatewords:30|linebreaks }}</p>
-            <div class="note-footer">
-                <span>{{ note.updated_at|timesince }} ago</span>
+            <h3 class="text-xl font-bold mb-3">{{ note.title }}</h3>
+            <div class="text-gray-400 mb-4 line-clamp-6">{{ note.content|linebreaks }}</div>
+            <div class="note-footer border-t border-border pt-3 mt-3">
+                <span class="text-xs text-gray-500 font-medium">{{ note.updated_at|timesince }} ago</span>
                 {% if note.tags.all %}
-                <div class="note-tags">
+                <div class="note-tags flex flex-wrap gap-1 mt-2">
                     {% for tag in note.tags.all %}
-                    <span class="tag" style="background: {{ tag.color }}20; color: {{ tag.color }};">{{ tag.name }}</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" style="background: {{ tag.color }}20; color: {{ tag.color }}; border: 1px solid {{ tag.color }}40;">{{ tag.name }}</span>
                     {% endfor %}
                 </div>
                 {% endif %}
@@ -33,11 +39,16 @@
         </div>
         {% endfor %}
     {% else %}
-        <div class="empty-state">
-            <div class="empty-icon">📝</div>
-            <h2>No notes yet</h2>
-            <p>Start writing your first note!</p>
-            <a href="{% url 'note_create' %}" class="btn btn-primary" style="margin-top: 1.5rem;">➕ Create Note</a>
+        <div class="empty-state card py-12 text-center col-span-full">
+            <div class="empty-icon opacity-20 mb-4">
+                {% include "includes/heroicon.html" with icon_name="document-text" class="icon-xl mx-auto" %}
+            </div>
+            <h2 class="text-xl font-bold mb-2">No notes yet</h2>
+            <p class="text-gray-500 mb-6">Start writing your first note!</p>
+            <a href="{% url 'note_create' %}" class="btn btn-primary">
+                {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+                Create Note
+            </a>
         </div>
     {% endif %}
 </div>
@@ -61,52 +72,19 @@
 
 .note-card:hover {
     border-color: var(--primary);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
 }
 
 .pin-badge {
-    display: inline-block;
     padding: 0.25rem 0.75rem;
-    background: rgba(245, 158, 11, 0.15);
-    color: var(--warning);
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--accent);
     border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-}
-
-.note-card h3 {
-    font-size: 1.2rem;
+    font-size: 0.7rem;
     font-weight: 700;
-    margin-bottom: 0.75rem;
-}
-
-.note-card p {
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 1rem;
-}
-
-.note-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-}
-
-.note-tags {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.tag {
-    padding: 0.25rem 0.75rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 @media (max-width: 1024px) {

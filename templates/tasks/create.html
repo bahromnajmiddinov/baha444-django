@@ -1,150 +1,130 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if task %}Edit Task{% else %}Create Task{% endif %}{% endblock %}
+{% block title %}{% if task %}Edit Task{% else %}Create Task{% endif %} - FlowHub{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div>
-        <h1 class="page-title">{% if task %}Edit Task{% else %}Create New Task{% endif %}</h1>
-        <p class="page-subtitle">{% if task %}Update task details{% else %}Add a new task to your workflow{% endif %}</p>
+<div class="max-w-3xl mx-auto">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">{% if task %}Edit Task{% else %}New Task{% endif %}</h1>
+            <p class="page-subtitle">{% if task %}Update details for "{{ task.title }}"{% else %}Create a new task in your workflow{% endif %}</p>
+        </div>
+        <a href="{% if task %}{% url 'task_detail' task.id %}{% else %}{% url 'task_list' %}{% endif %}" class="btn btn-secondary">Cancel</a>
     </div>
-</div>
 
-<div class="form-container">
-    <form method="post" class="task-form">
+    <form method="post" class="card space-y-6">
         {% csrf_token %}
         
         <div class="form-group">
-            <label for="title">Task Title *</label>
+            <label for="title" class="block text-sm font-medium text-gray-400 mb-1">Task Title *</label>
             <input type="text" id="title" name="title" value="{{ task.title|default:'' }}" 
-                   placeholder="e.g., Complete project proposal" required autofocus>
+                   class="w-full bg-bg-tertiary border border-border rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-lg"
+                   placeholder="What needs to be done?" required autofocus>
         </div>
         
         <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" name="description" rows="5" 
+            <label for="description" class="block text-sm font-medium text-gray-400 mb-1">Description</label>
+            <textarea id="description" name="description" rows="4" 
+                      class="w-full bg-bg-tertiary border border-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary"
                       placeholder="Add more details about this task...">{{ task.description|default:'' }}</textarea>
         </div>
         
-        <div class="form-row">
+        <div class="grid grid-2">
             <div class="form-group">
-                <label for="status">Status</label>
-                <select id="status" name="status">
-                    <option value="pitched" {% if task.status == 'pitched' or not task %}selected{% endif %}>📌 Pitched</option>
-                    <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>🚀 In Progress</option>
-                    <option value="completed" {% if task.status == 'completed' %}selected{% endif %}>✅ Completed</option>
-                    <option value="paid" {% if task.status == 'paid' %}selected{% endif %}>💰 Paid</option>
+                <label for="status" class="block text-sm font-medium text-gray-400 mb-1">Status</label>
+                <select id="status" name="status" class="w-full bg-bg-tertiary border border-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary">
+                    <option value="pitched" {% if task.status == 'pitched' or not task %}selected{% endif %}>Pitched</option>
+                    <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="completed" {% if task.status == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="paid" {% if task.status == 'paid' %}selected{% endif %}>Paid</option>
                 </select>
             </div>
             
             <div class="form-group">
-                <label for="priority">Priority</label>
-                <select id="priority" name="priority">
-                    <option value="low" {% if task.priority == 'low' %}selected{% endif %}>🔵 Low</option>
-                    <option value="medium" {% if task.priority == 'medium' or not task %}selected{% endif %}>🟡 Medium</option>
-                    <option value="high" {% if task.priority == 'high' %}selected{% endif %}>🔴 High</option>
+                <label for="priority" class="block text-sm font-medium text-gray-400 mb-1">Priority</label>
+                <select id="priority" name="priority" class="w-full bg-bg-tertiary border border-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary">
+                    <option value="low" {% if task.priority == 'low' %}selected{% endif %}>Low</option>
+                    <option value="medium" {% if task.priority == 'medium' or not task %}selected{% endif %}>Medium</option>
+                    <option value="high" {% if task.priority == 'high' %}selected{% endif %}>High</option>
                 </select>
             </div>
         </div>
-        
+
+        <div class="grid grid-2">
+            <div class="form-group">
+                <label for="start_date" class="block text-sm font-medium text-gray-400 mb-1">Start Date</label>
+                <input type="datetime-local" id="start_date" name="start_date" 
+                       class="w-full bg-bg-tertiary border border-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary"
+                       value="{% if task.start_date %}{{ task.start_date|date:'Y-m-d\TH:i' }}{% endif %}">
+            </div>
+            
+            <div class="form-group">
+                <label for="due_date" class="block text-sm font-medium text-gray-400 mb-1">Due Date</label>
+                <input type="datetime-local" id="due_date" name="due_date" 
+                       class="w-full bg-bg-tertiary border border-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary"
+                       value="{% if task.due_date %}{{ task.due_date|date:'Y-m-d\TH:i' }}{% endif %}">
+            </div>
+        </div>
+
+        <div class="grid grid-2">
+            <div class="form-group">
+                <label for="estimated_duration" class="block text-sm font-medium text-gray-400 mb-1">Estimated Duration (minutes)</label>
+                <input type="number" id="estimated_duration" name="estimated_duration" 
+                       class="w-full bg-bg-tertiary border border-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary"
+                       value="{{ task.estimated_duration|default:'' }}" placeholder="e.g. 60">
+            </div>
+            
+            <div class="form-group">
+                <label for="task_list" class="block text-sm font-medium text-gray-400 mb-1">Task List</label>
+                <select id="task_list" name="task_list" class="w-full bg-bg-tertiary border border-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary">
+                    <option value="">No List</option>
+                    {% for list in task_lists %}
+                        <option value="{{ list.id }}" {% if task.task_list_id == list.id or request.GET.list == list.id|stringformat:"i" %}selected{% endif %}>
+                            {{ list.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
         <div class="form-group">
-            <label for="due_date">Due Date</label>
-            <input type="datetime-local" id="due_date" name="due_date" 
-                   value="{% if task.due_date %}{{ task.due_date|date:'Y-m-d\TH:i' }}{% endif %}">
+            <label class="block text-sm font-medium text-gray-400 mb-3">Tags</label>
+            <div class="grid grid-4 gap-3">
+                {% for tag in tags %}
+                <label class="relative flex items-center p-3 rounded-xl border border-border bg-bg-tertiary cursor-pointer hover:bg-white/5 transition-colors">
+                    <input type="checkbox" name="tags" value="{{ tag.id }}" class="sr-only peer" 
+                           {% if tag in task.tags.all %}checked{% endif %}>
+                    <div class="w-full flex items-center gap-2 peer-checked:text-primary">
+                        <div class="w-3 h-3 rounded-full" style="background-color: {{ tag.color }};"></div>
+                        <span class="text-sm font-medium">{{ tag.name }}</span>
+                    </div>
+                    <div class="absolute inset-0 border-2 border-transparent peer-checked:border-primary rounded-xl pointer-events-none"></div>
+                </label>
+                {% endfor %}
+            </div>
+            {% if not tags %}
+                <p class="text-xs text-gray-500">No tags created yet. <a href="{% url 'tag_create' %}" class="text-primary hover:underline">Create some</a> to organize your tasks.</p>
+            {% endif %}
+        </div>
+
+        <div class="flex items-center gap-2 pt-4">
+            <input type="checkbox" id="is_pinned" name="is_pinned" {% if task.is_pinned %}checked{% endif %}
+                   class="w-5 h-5 rounded border-gray-700 bg-bg-tertiary text-primary focus:ring-primary">
+            <label for="is_pinned" class="text-sm font-medium text-gray-300">Pin this task to dashboard</label>
         </div>
         
-        <div class="form-group">
-            <label for="tags">Tags</label>
-            <input type="text" id="tags" name="tags" value="{{ task.tags|default:'' }}" 
-                   placeholder="design, urgent, client-work (comma separated)">
-        </div>
-        
-        <div class="form-actions">
-            <a href="{% url 'task_list' %}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">
-                {% if task %}💾 Update Task{% else %}➕ Create Task{% endif %}
+        <div class="pt-6 border-t border-border flex justify-end gap-3">
+            <a href="{% if task %}{% url 'task_detail' task.id %}{% else %}{% url 'task_list' %}{% endif %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary px-8">
+                {% if task %}
+                    {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-sm" %}
+                    Update Task
+                {% else %}
+                    {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+                    Create Task
+                {% endif %}
             </button>
         </div>
     </form>
 </div>
-
-<style>
-.form-container {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.task-form {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 2rem;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-}
-
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: 0.95rem;
-}
-
-input, textarea, select {
-    width: 100%;
-    padding: 0.875rem 1rem;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 1rem;
-    transition: all 0.2s;
-}
-
-input:focus, textarea:focus, select:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-textarea {
-    resize: vertical;
-    line-height: 1.6;
-}
-
-select {
-    cursor: pointer;
-}
-
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-    justify-content: flex-end;
-}
-
-@media (max-width: 768px) {
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-    }
-    
-    .btn {
-        width: 100%;
-    }
-}
-</style>
 {% endblock %}

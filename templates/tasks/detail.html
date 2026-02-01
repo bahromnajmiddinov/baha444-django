@@ -1,126 +1,198 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ task.title }}{% endblock %}
+{% block title %}{{ task.title }} - FlowHub{% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <div>
-        <h1 class="page-title">{{ task.title }}</h1>
-        <p class="page-subtitle">Task Details</p>
+    <div class="flex items-center gap-4">
+        <a href="{% url 'task_list' %}" class="btn btn-secondary p-2 rounded-full">
+            {% include "includes/heroicon.html" with icon_name="home" class="icon-sm" %}
+        </a>
+        <div>
+            <h1 class="page-title">{{ task.title }}</h1>
+            <p class="page-subtitle">Created on {{ task.created_at|date:"F d, Y" }}</p>
+        </div>
     </div>
-    <div style="display: flex; gap: 1rem;">
-        <a href="{% url 'task_list' %}" class="btn btn-secondary">← Back</a>
-        <a href="{% url 'task_update' task.id %}" class="btn btn-secondary">✏️ Edit</a>
+    <div class="flex gap-2">
+        <a href="{% url 'task_update' task.id %}" class="btn btn-secondary">
+            {% include "includes/heroicon.html" with icon_name="pencil" class="icon-sm" %}
+            Edit
+        </a>
+        <button onclick="deleteTask({{ task.id }})" class="btn btn-secondary text-danger">
+            {% include "includes/heroicon.html" with icon_name="trash" class="icon-sm" %}
+            Delete
+        </button>
     </div>
 </div>
 
-<div class="task-detail-container">
-    <div class="task-detail-main">
-        <div class="detail-section">
-            <h2>Description</h2>
-            <p>{{ task.description|default:"No description provided"|linebreaks }}</p>
-        </div>
-        
-        <div class="detail-section">
-            <h2>Details</h2>
-            <div class="detail-grid">
-                <div>
-                    <strong>Status:</strong>
-                    <span class="status-badge status-{{ task.status }}">{{ task.get_status_display }}</span>
-                </div>
-                <div>
-                    <strong>Priority:</strong>
-                    <span class="priority-badge priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
-                </div>
-                <div>
-                    <strong>Due Date:</strong>
-                    {{ task.due_date|date:"F d, Y g:i A"|default:"Not set" }}
-                </div>
-                <div>
-                    <strong>Created:</strong>
-                    {{ task.created_at|date:"F d, Y" }}
-                </div>
+<div class="grid grid-3 gap-8">
+    <div class="col-span-2 space-y-6">
+        <!-- Description -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                {% include "includes/heroicon.html" with icon_name="document-text" class="icon-md text-primary" %}
+                Description
+            </h2>
+            <div class="text-gray-300 whitespace-pre-wrap">
+                {{ task.description|default:"No description provided" }}
             </div>
         </div>
-        
-        {% if task.tags %}
-        <div class="detail-section">
-            <h2>Tags</h2>
-            <div class="tags">
-                {{ task.tags }}
+
+        <!-- Subtasks -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                {% include "includes/heroicon.html" with icon_name="list-bullet" class="icon-md text-primary" %}
+                Subtasks
+            </h2>
+            <div class="space-y-2">
+                {% for subtask in task.subtasks.all %}
+                <div class="flex items-center gap-3 p-2 hover:bg-white/5 rounded-lg transition-colors">
+                    <input type="checkbox" {% if subtask.is_completed %}checked{% endif %} class="w-5 h-5 rounded border-gray-700 bg-bg-tertiary text-primary focus:ring-primary">
+                    <span class="{% if subtask.is_completed %}line-through text-gray-500{% else %}text-gray-200{% endif %}">
+                        {{ subtask.title }}
+                    </span>
+                </div>
+                {% empty %}
+                <p class="text-gray-500 text-sm">No subtasks added yet.</p>
+                {% endfor %}
             </div>
+        </div>
+
+        <!-- Activity History -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                {% include "includes/heroicon.html" with icon_name="clock" class="icon-md text-primary" %}
+                Activity History
+            </h2>
+            <div class="relative pl-6 space-y-6 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-gray-800">
+                {% for activity in task.activities.all %}
+                <div class="relative">
+                    <div class="absolute -left-[21px] top-1 w-4 h-4 rounded-full bg-bg-card border-2 border-primary z-10"></div>
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <span class="font-semibold text-gray-200 capitalize">{{ activity.action }}</span>
+                            <span class="text-xs text-gray-500">{{ activity.timestamp|date:"M d, H:i" }}</span>
+                        </div>
+                        <p class="text-sm text-gray-400">by {{ activity.user.username }}</p>
+                        {% if activity.changes %}
+                        <ul class="mt-2 text-xs text-gray-500 space-y-1">
+                            {% for field, change in activity.changes.items %}
+                            <li><span class="text-gray-400 font-medium">{{ field }}:</span> {{ change }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-gray-500 text-sm">No activity recorded yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Info -->
+    <div class="space-y-6">
+        <div class="card space-y-6">
+            <h2 class="text-lg font-bold border-b border-border pb-2">Task Meta</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Status</label>
+                    {% include "tasks/partials/status_badge.html" with status=task.status %}
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Priority</label>
+                    <div class="flex items-center gap-2">
+                        {% include "tasks/partials/priority_icon.html" with priority=task.priority %}
+                        <span class="capitalize text-gray-200">{{ task.get_priority_display }}</span>
+                    </div>
+                </div>
+
+                {% if task.task_list %}
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">List</label>
+                    <div class="flex items-center gap-2 text-gray-200">
+                        {% include "includes/heroicon.html" with icon_name=task.task_list.icon|default:"list-bullet" class="icon-sm" %}
+                        <span>{{ task.task_list.name }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Start Date</label>
+                    <div class="flex items-center gap-2 text-gray-200 text-sm">
+                        {% include "includes/heroicon.html" with icon_name="calendar" class="icon-sm text-gray-500" %}
+                        <span>{{ task.start_date|date:"M d, Y"|default:"Not set" }}</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Due Date</label>
+                    <div class="flex items-center gap-2 text-sm {% if task.is_overdue %}text-danger{% else %}text-gray-200{% endif %}">
+                        {% include "includes/heroicon.html" with icon_name="calendar" class="icon-sm {% if not task.is_overdue %}text-gray-500{% endif %}" %}
+                        <span>{{ task.due_date|date:"M d, Y"|default:"Not set" }}</span>
+                    </div>
+                </div>
+
+                {% if task.estimated_duration %}
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Estimated Duration</label>
+                    <div class="flex items-center gap-2 text-gray-200 text-sm">
+                        {% include "includes/heroicon.html" with icon_name="clock" class="icon-sm text-gray-500" %}
+                        <span>{{ task.estimated_duration }} minutes</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if task.tags.all %}
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Tags</label>
+                    <div class="flex flex-wrap gap-2 mt-1">
+                        {% for tag in task.tags.all %}
+                            {% include "tasks/partials/tag_badge.html" with tag=tag %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if task.attachments.all %}
+        <div class="card">
+            <h3 class="font-bold mb-4 flex items-center gap-2">
+                {% include "includes/heroicon.html" with icon_name="paperclip" class="icon-sm text-primary" %}
+                Attachments ({{ task.attachments.count }})
+            </h3>
+            <ul class="space-y-2">
+                {% for attachment in task.attachments.all %}
+                <li>
+                    <a href="{{ attachment.file.url }}" class="text-sm text-gray-400 hover:text-primary flex items-center gap-2 transition-colors">
+                        {% include "includes/heroicon.html" with icon_name="document-text" class="icon-sm" %}
+                        {{ attachment.filename }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
         </div>
         {% endif %}
     </div>
 </div>
 
-<style>
-.task-detail-container {
-    max-width: 900px;
-    margin: 0 auto;
+<script>
+function deleteTask(taskId) {
+    if (confirm('Are you sure you want to delete this task?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/tasks/${taskId}/delete/`;
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = '{{ csrf_token }}';
+        form.appendChild(csrfInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
 }
-
-.task-detail-main {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 2rem;
-}
-
-.detail-section {
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--border);
-}
-
-.detail-section:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-.detail-section h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
-
-.detail-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-}
-
-.detail-grid div {
-    padding: 1rem;
-    background: var(--bg-tertiary);
-    border-radius: 8px;
-}
-
-.detail-grid strong {
-    display: block;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    margin-bottom: 0.5rem;
-}
-
-.status-badge, .priority-badge {
-    padding: 0.375rem 0.875rem;
-    border-radius: 999px;
-    font-size: 0.875rem;
-    font-weight: 600;
-}
-
-.status-pitched { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-.status-in_progress { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-.status-completed { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-.status-paid { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
-.priority-high { background: rgba(239, 68, 68, 0.15); color: #f87171; }
-.priority-medium { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-.priority-low { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-
-.tags {
-    color: var(--text-secondary);
-}
-</style>
+</script>
 {% endblock %}

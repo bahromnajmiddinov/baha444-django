@@ -1,0 +1,31 @@
+<div class="card p-4 mb-3" id="task-{{ task.id }}">
+    <div class="flex justify-between items-start mb-2">
+        <h4 class="text-lg font-semibold">
+            <a href="{% url 'task_detail' task.pk %}" class="hover:text-primary transition-colors">
+                {{ task.title }}
+            </a>
+        </h4>
+        <div class="flex gap-2">
+            <button hx-post="{% url 'task_toggle_pin' task.pk %}" hx-target="#task-{{ task.id }}" hx-swap="outerHTML" class="text-gray-400 hover:text-accent">
+                {% if task.is_pinned %}
+                    {% include "includes/heroicon.html" with icon_name="star" class="icon-sm text-accent" %}
+                {% else %}
+                    {% include "includes/heroicon.html" with icon_name="star" class="icon-sm" %}
+                {% endif %}
+            </button>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        {% include "tasks/partials/task_meta.html" with task=task %}
+    </div>
+    
+    <div class="flex justify-end gap-2 mt-4">
+        <a href="{% url 'task_update' task.pk %}" class="btn btn-secondary p-1">
+            {% include "includes/heroicon.html" with icon_name="pencil" class="icon-sm" %}
+        </a>
+        <button hx-post="{% url 'task_archive' task.pk %}" hx-target="#task-{{ task.id }}" hx-swap="delete" hx-confirm="Are you sure?" class="btn btn-secondary p-1 text-danger">
+            {% include "includes/heroicon.html" with icon_name="archive-box" class="icon-sm" %}
+        </button>
+    </div>
+</div>

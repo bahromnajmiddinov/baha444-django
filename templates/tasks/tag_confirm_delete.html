@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Tag: {{ tag.name }} - FlowHub{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto py-12">
+    <div class="card border-danger/20">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-danger/10 text-danger rounded-full flex items-center justify-center mx-auto mb-4">
+                {% include "includes/heroicon.html" with icon_name="trash" class="icon-lg" %}
+            </div>
+            <h1 class="text-2xl font-bold">Delete Tag</h1>
+            <p class="text-gray-400 mt-2">Are you sure you want to delete the tag "<span class="text-white font-semibold">{{ tag.name }}</span>"?</p>
+            <p class="text-sm text-gray-500 mt-4">This action will remove the tag from all associated tasks. This cannot be undone.</p>
+        </div>
+
+        <form method="post" class="flex flex-col gap-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary bg-danger hover:bg-danger/80 w-full justify-center">
+                Yes, Delete Tag
+            </button>
+            <a href="{% url 'tag_list' %}" class="btn btn-secondary w-full justify-center">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -5,10 +5,13 @@
 {% block content %}
 <div class="page-header">
     <div>
-        <h1 class="page-title">Habits 🔥</h1>
+        <h1 class="page-title">Habits</h1>
         <p class="page-subtitle">Build consistency, one day at a time</p>
     </div>
-    <a href="{% url 'habit_create' %}" class="btn btn-primary">➕ New Habit</a>
+    <a href="{% url 'habit_create' %}" class="btn btn-primary">
+        {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+        New Habit
+    </a>
 </div>
 
 <div class="habits-grid">
@@ -17,43 +20,65 @@
         <div class="habit-card">
             <div class="habit-header">
                 <div class="habit-icon" style="background: {{ habit.color }}20; color: {{ habit.color }};">
-                    {{ habit.icon }}
+                    {% if habit.icon %}
+                        <span class="text-2xl">{{ habit.icon }}</span>
+                    {% else %}
+                        {% include "includes/heroicon.html" with icon_name="fire" class="icon-lg" %}
+                    {% endif %}
                 </div>
                 <div class="habit-info">
-                    <h3>{{ habit.name }}</h3>
-                    <p>{{ habit.description|truncatewords:10 }}</p>
+                    <h3 class="text-lg font-bold text-gray-100">{{ habit.name }}</h3>
+                    <p class="text-sm text-gray-500">{{ habit.description|truncatewords:10 }}</p>
                 </div>
             </div>
             
             <div class="habit-stats">
                 <div class="stat-item">
-                    <div class="stat-value">{{ habit.current_streak }}</div>
-                    <div class="stat-label">🔥 Day Streak</div>
+                    <div class="stat-value text-xl font-bold">{{ habit.current_streak }}</div>
+                    <div class="stat-label flex items-center justify-center gap-1">
+                        {% include "includes/heroicon.html" with icon_name="fire" class="icon-sm text-orange-500" %}
+                        Streak
+                    </div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">{{ habit.total_completions }}</div>
-                    <div class="stat-label">✓ Total</div>
+                    <div class="stat-value text-xl font-bold">{{ habit.total_completions }}</div>
+                    <div class="stat-label flex items-center justify-center gap-1">
+                        {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-sm text-success" %}
+                        Total
+                    </div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">{{ habit.completion_rate }}%</div>
-                    <div class="stat-label">📊 Rate</div>
+                    <div class="stat-value text-xl font-bold">{{ habit.completion_rate }}%</div>
+                    <div class="stat-label flex items-center justify-center gap-1">
+                        {% include "includes/heroicon.html" with icon_name="chart-bar" class="icon-sm text-info" %}
+                        Rate
+                    </div>
                 </div>
             </div>
             
-            <button class="complete-btn {% if habit.id in today_completions %}completed{% endif %}" 
+            <button class="complete-btn w-full mt-4 flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all {% if habit.id in today_completions %}bg-success border-success text-white{% else %}bg-bg-tertiary border-border text-gray-300 hover:border-primary{% endif %}" 
                     onclick="toggleHabit({{ habit.id }}, this)">
-                <span class="checkmark">{% if habit.id in today_completions %}✓{% else %}○{% endif %}</span>
-                <span class="text">{% if habit.id in today_completions %}Completed Today!{% else %}Complete Today{% endif %}</span>
+                <span class="checkmark">
+                    {% if habit.id in today_completions %}
+                        {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-md" %}
+                    {% else %}
+                        <div class="w-6 h-6 rounded-full border-2 border-current"></div>
+                    {% endif %}
+                </span>
+                <span class="text font-bold">{% if habit.id in today_completions %}Completed Today!{% else %}Complete Today{% endif %}</span>
             </button>
         </div>
         {% endfor %}
     {% else %}
-        <div class="empty-state" style="grid-column: 1 / -1;">
-            <div class="empty-icon">🔥</div>
-            <h2>No habits yet</h2>
-            <p>Create your first habit to start building consistency!</p>
-            <a href="{% url 'habit_create' %}" class="btn btn-primary" style="margin-top: 1.5rem;">
-                ➕ Create Habit
+        <div class="empty-state card py-12 text-center col-span-full">
+            <div class="empty-icon opacity-20 mb-4">
+                {% include "includes/heroicon.html" with icon_name="fire" class="icon-xl mx-auto" %}
+            </div>
+            <h2 class="text-xl font-bold mb-2">No habits yet</h2>
+            <p class="text-gray-500 mb-6">Create your first habit to start building consistency!</p>
+            <a href="{% url 'habit_create' %}" class="btn btn-primary">
+                {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+                Create Habit
             </a>
         </div>
     {% endif %}
@@ -74,12 +99,6 @@
     transition: all 0.3s;
 }
 
-.habit-card:hover {
-    border-color: var(--primary);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
-    transform: translateY(-4px);
-}
-
 .habit-header {
     display: flex;
     gap: 1rem;
@@ -93,19 +112,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
     flex-shrink: 0;
-}
-
-.habit-info h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 0.25rem;
-}
-
-.habit-info p {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
 }
 
 .habit-stats {
@@ -122,67 +129,12 @@
     text-align: center;
 }
 
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--text-primary);
-}
-
 .stat-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-secondary);
     margin-top: 0.25rem;
-}
-
-.complete-btn {
-    width: 100%;
-    padding: 1rem;
-    background: var(--bg-tertiary);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    color: var(--text-primary);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-}
-
-.complete-btn:hover {
-    background: var(--bg-card);
-    border-color: var(--primary);
-}
-
-.complete-btn.completed {
-    background: linear-gradient(135deg, var(--success), #059669);
-    border-color: var(--success);
-    color: white;
-}
-
-.complete-btn .checkmark {
-    font-size: 1.5rem;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text-secondary);
-}
-
-.empty-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
-.empty-state h2 {
-    font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
+    text-transform: uppercase;
 }
 </style>
 
@@ -211,17 +163,7 @@ function toggleHabit(habitId, button) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.completed) {
-            button.classList.add('completed');
-            button.querySelector('.checkmark').textContent = '✓';
-            button.querySelector('.text').textContent = 'Completed Today!';
-        } else {
-            button.classList.remove('completed');
-            button.querySelector('.checkmark').textContent = '○';
-            button.querySelector('.text').textContent = 'Complete Today';
-        }
-        // Reload to update streak
-        setTimeout(() => location.reload(), 500);
+        location.reload();
     });
 }
 </script>

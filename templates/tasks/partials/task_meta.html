@@ -1,0 +1,32 @@
+<div class="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
+    <div class="flex items-center gap-1">
+        {% include "tasks/partials/priority_icon.html" with priority=task.priority class="icon-sm" %}
+        <span class="capitalize">{{ task.priority }}</span>
+    </div>
+    
+    <div class="flex items-center gap-1">
+        {% include "tasks/partials/status_badge.html" with status=task.status %}
+    </div>
+
+    {% if task.due_date %}
+    <div class="flex items-center gap-1 {% if task.is_overdue %}text-danger{% endif %}">
+        {% include "includes/heroicon.html" with icon_name="calendar" class="icon-sm" %}
+        <span>{{ task.due_date|date:"M d, Y" }}</span>
+    </div>
+    {% endif %}
+
+    {% if task.tags.all %}
+    <div class="flex items-center gap-1">
+        {% for tag in task.tags.all %}
+            {% include "tasks/partials/tag_badge.html" with tag=tag %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if task.attachments_count > 0 %}
+    <div class="flex items-center gap-1">
+        {% include "includes/heroicon.html" with icon_name="paperclip" class="icon-sm" %}
+        <span>{{ task.attachments_count }}</span>
+    </div>
+    {% endif %}
+</div>

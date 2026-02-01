@@ -5,23 +5,29 @@
 {% block content %}
 <div class="page-header">
     <div>
-        <h1 class="page-title">Welcome back! 👋</h1>
+        <h1 class="page-title">Welcome back!</h1>
         <p class="page-subtitle">Here's what's happening with your productivity today</p>
     </div>
-    <a href="{% url 'task_create' %}" class="btn btn-primary">
-        <span>➕</span>
-        <span>New Task</span>
-    </a>
+    <div class="flex gap-3">
+        <a href="{% url 'dashboard_enhanced' %}" class="btn btn-secondary">
+            {% include "includes/heroicon.html" with icon_name="chart-bar" class="icon-sm" %}
+            Task Dashboard
+        </a>
+        <a href="{% url 'task_create' %}" class="btn btn-primary">
+            {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+            New Task
+        </a>
+    </div>
 </div>
 
 <!-- Stats Overview -->
-<div class="grid grid-4" style="margin-bottom: 2rem;">
+<div class="grid grid-4 mb-8">
     <div class="stat-card">
         <div class="stat-label">Total Tasks</div>
         <div class="stat-value">{{ tasks_total }}</div>
         <div class="stat-change positive">
-            <span>↗</span>
-            <span>{{ tasks_in_progress }} in progress</span>
+            {% include "includes/heroicon.html" with icon_name="clock" class="icon-sm" %}
+            {{ tasks_in_progress }} in progress
         </div>
     </div>
     
@@ -29,8 +35,8 @@
         <div class="stat-label">Completed Today</div>
         <div class="stat-value">{{ tasks_completed }}</div>
         <div class="stat-change positive">
-            <span>✓</span>
-            <span>Great work!</span>
+            {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-sm" %}
+            Great work!
         </div>
     </div>
     
@@ -38,8 +44,8 @@
         <div class="stat-label">Pomodoro Sessions</div>
         <div class="stat-value">{{ pomodoro_today }}</div>
         <div class="stat-change {% if pomodoro_today >= 4 %}positive{% endif %}">
-            <span>⏱️</span>
-            <span>{{ pomodoro_today|floatformat:0 }}h focused</span>
+            {% include "includes/heroicon.html" with icon_name="clock" class="icon-sm" %}
+            {{ pomodoro_today|floatformat:0 }} focused
         </div>
     </div>
     
@@ -47,135 +53,155 @@
         <div class="stat-label">Monthly Balance</div>
         <div class="stat-value">${{ balance|floatformat:0 }}</div>
         <div class="stat-change {% if balance >= 0 %}positive{% else %}negative{% endif %}">
-            <span>{% if balance >= 0 %}↗{% else %}↘{% endif %}</span>
-            <span>${{ income|floatformat:0 }} income</span>
+            {% include "includes/heroicon.html" with icon_name="currency-dollar" class="icon-sm" %}
+            ${{ income|floatformat:0 }} income
         </div>
     </div>
 </div>
 
 <!-- Main Content Grid -->
-<div class="grid grid-2" style="gap: 2rem;">
+<div class="grid grid-2 gap-8">
     <!-- Left Column -->
-    <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <div class="space-y-8">
         <!-- Today's Tasks -->
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 700;">Today's Tasks</h2>
-                <a href="{% url 'task_list' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">View all →</a>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    {% include "includes/heroicon.html" with icon_name="calendar" class="icon-md text-primary" %}
+                    Today's Tasks
+                </h2>
+                <a href="{% url 'task_list' %}" class="text-sm font-semibold text-primary hover:underline">View all</a>
             </div>
             
             {% if tasks_today %}
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="space-y-3">
                 {% for task in tasks_today %}
-                <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: 12px; border-left: 3px solid 
-                    {% if task.priority == 'high' %}var(--danger)
-                    {% elif task.priority == 'medium' %}var(--warning)
-                    {% else %}var(--info){% endif %};">
-                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div class="p-4 bg-bg-tertiary rounded-xl border-l-4 
+                    {% if task.priority == 'high' %}border-danger
+                    {% elif task.priority == 'medium' %}border-warning
+                    {% else %}border-info{% endif %}">
+                    <div class="flex justify-between items-start">
                         <div>
-                            <h3 style="font-weight: 600; margin-bottom: 0.25rem;">{{ task.title }}</h3>
-                            <p style="font-size: 0.875rem; color: var(--text-secondary);">
-                                {% if task.due_date %}Due: {{ task.due_date|date:"g:i A" }}{% endif %}
-                            </p>
+                            <h3 class="font-semibold text-gray-100 mb-1">{{ task.title }}</h3>
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                {% if task.due_date %}
+                                    <span class="flex items-center gap-1">
+                                        {% include "includes/heroicon.html" with icon_name="clock" class="icon-sm" %}
+                                        {{ task.due_date|date:"g:i A" }}
+                                    </span>
+                                {% endif %}
+                                {% if task.task_list %}
+                                    <span class="flex items-center gap-1">
+                                        {% include "includes/heroicon.html" with icon_name="list-bullet" class="icon-sm" %}
+                                        {{ task.task_list.name }}
+                                    </span>
+                                {% endif %}
+                            </div>
                         </div>
-                        <span style="padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600;
-                            background: rgba(99, 102, 241, 0.1); color: var(--primary);">
-                            {{ task.get_priority_display }}
-                        </span>
+                        <div class="flex items-center gap-2">
+                            {% include "tasks/partials/priority_icon.html" with priority=task.priority %}
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
-            <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
-                <p style="font-weight: 600;">No tasks due today</p>
-                <p style="font-size: 0.875rem;">Enjoy your free time!</p>
+            <div class="text-center py-12 text-gray-500">
+                {% include "includes/heroicon.html" with icon_name="sparkles" class="icon-xl mx-auto mb-4 opacity-20" %}
+                <p class="font-semibold">No tasks due today</p>
+                <p class="text-sm">Enjoy your free time!</p>
             </div>
             {% endif %}
         </div>
         
         <!-- Habit Tracker -->
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 700;">Today's Habits</h2>
-                <a href="{% url 'habit_list' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">View all →</a>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    {% include "includes/heroicon.html" with icon_name="fire" class="icon-md text-orange-500" %}
+                    Today's Habits
+                </h2>
+                <a href="{% url 'habit_list' %}" class="text-sm font-semibold text-primary hover:underline">View all</a>
             </div>
             
             {% if habits %}
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+            <div class="grid grid-2 gap-4">
                 {% for habit in habits %}
-                <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: 12px; text-align: center;">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">{{ habit.icon }}</div>
-                    <div style="font-weight: 600; margin-bottom: 0.5rem;">{{ habit.name }}</div>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <div class="p-4 bg-bg-tertiary rounded-xl text-center border border-border hover:border-border-hover transition-colors">
+                    <div class="text-3xl mb-2">{{ habit.icon }}</div>
+                    <div class="font-semibold mb-3">{{ habit.name }}</div>
+                    <div class="flex items-center justify-center gap-3">
                         {% if habit.id in today_completions %}
-                        <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem;">✓</div>
+                        <div class="w-8 h-8 rounded-full bg-success flex items-center justify-center text-white">
+                            {% include "includes/heroicon.html" with icon_name="check-circle" class="icon-sm" %}
+                        </div>
                         {% else %}
-                        <div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer;"></div>
+                        <div class="w-8 h-8 rounded-full border-2 border-border hover:border-primary cursor-pointer transition-colors"></div>
                         {% endif %}
-                        <span style="font-size: 0.875rem; color: var(--text-secondary);">
-                            {{ habit.current_streak }} day streak 🔥
+                        <span class="text-xs font-bold text-gray-500">
+                            {{ habit.current_streak }}d streak
                         </span>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
-            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                <p>No habits yet. Create your first one!</p>
+            <div class="text-center py-8 text-gray-500">
+                <p>No habits yet. Start a new one today!</p>
             </div>
             {% endif %}
         </div>
     </div>
     
     <!-- Right Column -->
-    <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <div class="space-y-8">
         <!-- Daily Mood -->
         <div class="card">
-            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">How are you feeling?</h2>
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                {% include "includes/heroicon.html" with icon_name="sparkles" class="icon-md text-accent" %}
+                How are you feeling?
+            </h2>
             
-            <div style="display: flex; justify-content: space-around; margin-bottom: 1.5rem;">
+            <div class="flex justify-around mb-6">
                 {% for mood, label in daily_entry.MOOD_CHOICES %}
-                <button style="background: {% if daily_entry.mood == mood %}rgba(99, 102, 241, 0.2){% else %}var(--bg-tertiary){% endif %}; 
-                    border: 2px solid {% if daily_entry.mood == mood %}var(--primary){% else %}transparent{% endif %}; 
-                    padding: 1rem; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 2rem;">
-                    {{ label|slice:":2" }}
+                <button class="p-4 rounded-2xl transition-all hover:scale-110 
+                    {% if daily_entry.mood == mood %}bg-primary/20 border-2 border-primary{% else %}bg-bg-tertiary border-2 border-transparent{% endif %}">
+                    <span class="text-3xl">{{ label|slice:":2" }}</span>
                 </button>
                 {% endfor %}
             </div>
             
             <textarea placeholder="How's your day going? Write your thoughts..." 
-                style="width: 100%; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border); 
-                border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical; min-height: 100px;">{{ daily_entry.morning_notes }}</textarea>
+                class="w-full p-4 bg-bg-tertiary border border-border rounded-xl text-white focus:outline-none focus:border-primary resize-none min-height-[120px]">{{ daily_entry.morning_notes }}</textarea>
         </div>
         
         <!-- Recent Notes -->
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 700;">Recent Notes</h2>
-                <a href="{% url 'note_list' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">View all →</a>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    {% include "includes/heroicon.html" with icon_name="document-text" class="icon-md text-secondary" %}
+                    Recent Notes
+                </h2>
+                <a href="{% url 'note_list' %}" class="text-sm font-semibold text-primary hover:underline">View all</a>
             </div>
             
             {% if recent_notes %}
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div class="space-y-3">
                 {% for note in recent_notes %}
-                <a href="{% url 'note_detail' note.id %}" style="padding: 0.75rem; background: var(--bg-tertiary); 
-                    border-radius: 8px; text-decoration: none; color: var(--text-primary); transition: all 0.2s;
-                    display: block;">
-                    <div style="font-weight: 600; margin-bottom: 0.25rem;">{{ note.title }}</div>
-                    <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                <a href="{% url 'note_detail' note.id %}" class="block p-4 bg-bg-tertiary rounded-xl border border-transparent hover:border-border-hover hover:bg-white/5 transition-all">
+                    <div class="font-semibold mb-1 text-gray-100">{{ note.title }}</div>
+                    <div class="text-sm text-gray-500 line-clamp-1 mb-2">
                         {{ note.content|truncatewords:10 }}
                     </div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
-                        {{ note.updated_at|timesince }} ago
+                    <div class="text-[10px] text-gray-600 font-bold uppercase tracking-wider">
+                        Updated {{ note.updated_at|timesince }} ago
                     </div>
                 </a>
                 {% endfor %}
             </div>
             {% else %}
-            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                <p>No notes yet. Start writing!</p>
+            <div class="text-center py-8 text-gray-500">
+                <p>No notes yet. Capture your ideas!</p>
             </div>
             {% endif %}
         </div>
@@ -183,13 +209,17 @@
         <!-- Upcoming Reminders -->
         {% if upcoming_reminders %}
         <div class="card">
-            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Upcoming Reminders</h2>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2 text-warning">
+                {% include "includes/heroicon.html" with icon_name="clock" class="icon-md" %}
+                Upcoming Reminders
+            </h2>
+            <div class="space-y-3">
                 {% for reminder in upcoming_reminders %}
-                <div style="padding: 0.75rem; background: var(--bg-tertiary); border-radius: 8px;">
-                    <div style="font-weight: 600;">{{ reminder.title }}</div>
-                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                        ⏰ {{ reminder.remind_at|date:"M d, g:i A" }}
+                <div class="p-4 bg-bg-tertiary rounded-xl border border-warning/20">
+                    <div class="font-semibold mb-1">{{ reminder.title }}</div>
+                    <div class="text-xs text-warning flex items-center gap-1 font-bold">
+                        {% include "includes/heroicon.html" with icon_name="clock" class="icon-sm" %}
+                        {{ reminder.remind_at|date:"M d, g:i A" }}
                     </div>
                 </div>
                 {% endfor %}
@@ -198,14 +228,4 @@
         {% endif %}
     </div>
 </div>
-
-<style>
-    button:hover {
-        transform: scale(1.05);
-    }
-    
-    a:hover {
-        opacity: 0.8;
-    }
-</style>
 {% endblock %}

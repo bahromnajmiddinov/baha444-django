@@ -2,77 +2,114 @@
 
 {% load math_filters %}
 
-{% block title %}Finance Dashboard{% endblock %}
+{% block title %}Finance Dashboard - FlowHub{% endblock %}
 
 {% block content %}
 <div class="page-header">
     <div>
-        <h1 class="page-title">💰 Finance</h1>
+        <h1 class="page-title">Finance</h1>
         <p class="page-subtitle">Track your income, expenses, and budgets</p>
     </div>
-    <button class="btn btn-primary">➕ Add Transaction</button>
+    <button class="btn btn-primary">
+        {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+        Add Transaction
+    </button>
 </div>
 
-<div class="grid grid-3" style="margin-bottom: 2rem;">
+<div class="grid grid-3 mb-8">
     <div class="stat-card">
         <div class="stat-label">Total Balance</div>
         <div class="stat-value">${{ total_balance|floatformat:2 }}</div>
-        <div class="stat-change positive">↗ Across all accounts</div>
+        <div class="stat-change positive flex items-center gap-1">
+            {% include "includes/heroicon.html" with icon_name="sparkles" class="icon-sm" %}
+            Across all accounts
+        </div>
     </div>
     
     <div class="stat-card">
         <div class="stat-label">This Month Income</div>
-        <div class="stat-value" style="color: var(--success);">${{ income|floatformat:2 }}</div>
-        <div class="stat-change positive">✓ Revenue</div>
+        <div class="stat-value text-success">${{ income|floatformat:2 }}</div>
+        <div class="stat-change positive flex items-center gap-1">
+            {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+            Revenue
+        </div>
     </div>
     
     <div class="stat-card">
         <div class="stat-label">This Month Expenses</div>
-        <div class="stat-value" style="color: var(--danger);">${{ expenses|floatformat:2 }}</div>
-        <div class="stat-change negative">↘ Spending</div>
+        <div class="stat-value text-danger">${{ expenses|floatformat:2 }}</div>
+        <div class="stat-change negative flex items-center gap-1">
+            {% include "includes/heroicon.html" with icon_name="minus" class="icon-sm" %}
+            Spending
+        </div>
     </div>
 </div>
 
-<div class="grid grid-2">
-    <div class="card">
-        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Recent Transactions</h2>
+<div class="grid grid-2 gap-8">
+    <div class="card p-8">
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            {% include "includes/heroicon.html" with icon_name="list-bullet" class="icon-md text-primary" %}
+            Recent Transactions
+        </h2>
         {% if recent_transactions %}
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="space-y-3">
             {% for transaction in recent_transactions %}
-            <div style="display: flex; justify-content: space-between; padding: 1rem; background: var(--bg-tertiary); border-radius: 12px;">
-                <div>
-                    <div style="font-weight: 600;">{{ transaction.description }}</div>
-                    <div style="font-size: 0.875rem; color: var(--text-secondary);">{{ transaction.date|date:"M d, Y" }}</div>
+            <div class="flex justify-between items-center p-4 bg-bg-tertiary rounded-xl border border-transparent hover:border-border-hover transition-all">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center 
+                        {% if transaction.category.category_type == 'income' %}bg-success/10 text-success{% else %}bg-danger/10 text-danger{% endif %}">
+                        {% if transaction.category.category_type == 'income' %}
+                            {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+                        {% else %}
+                            {% include "includes/heroicon.html" with icon_name="minus" class="icon-sm" %}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <div class="font-bold text-gray-100 leading-none mb-1">{{ transaction.description }}</div>
+                        <div class="text-xs text-gray-500 font-medium">{{ transaction.date|date:"M d, Y" }}</div>
+                    </div>
                 </div>
-                <div style="font-size: 1.25rem; font-weight: 700; color: {% if transaction.category.category_type == 'income' %}var(--success){% else %}var(--danger){% endif %};">
+                <div class="text-lg font-black {% if transaction.category.category_type == 'income' %}text-success{% else %}text-danger{% endif %}">
                     {% if transaction.category.category_type == 'expense' %}-{% endif %}${{ transaction.amount }}
                 </div>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No transactions yet</p>
+        <div class="text-center py-12 text-gray-500">
+            {% include "includes/heroicon.html" with icon_name="currency-dollar" class="icon-xl mx-auto mb-4 opacity-20" %}
+            <p>No transactions yet</p>
+        </div>
         {% endif %}
     </div>
     
-    <div class="card">
-        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Budget Overview</h2>
+    <div class="card p-8">
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            {% include "includes/heroicon.html" with icon_name="chart-bar" class="icon-md text-secondary" %}
+            Budget Overview
+        </h2>
         {% if budgets %}
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <div class="space-y-6">
             {% for budget in budgets %}
             <div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span style="font-weight: 600;">{{ budget.category.name }}</span>
-                    <span style="color: var(--text-secondary);">${{ budget.spent|floatformat:0 }} / ${{ budget.amount|floatformat:0 }}</span>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-bold text-gray-200">{{ budget.category.name }}</span>
+                    <span class="text-xs font-bold text-gray-500">${{ budget.spent|floatformat:0 }} <span class="text-[10px] text-gray-600">/ ${{ budget.amount|floatformat:0 }}</span></span>
                 </div>
-                <div style="height: 8px; background: var(--bg-tertiary); border-radius: 999px; overflow: hidden;">
-                    <div style="height: 100%; background: {% if budget.percentage_used > 90 %}var(--danger){% elif budget.percentage_used > 70 %}var(--warning){% else %}var(--success){% endif %}; width: {{ budget.percentage_used }}%; transition: width 0.3s;"></div>
+                <div class="w-full h-3 bg-gray-800 rounded-full overflow-hidden">
+                    <div class="h-full transition-all duration-1000 
+                        {% if budget.percentage_used > 90 %}bg-danger
+                        {% elif budget.percentage_used > 70 %}bg-warning
+                        {% else %}bg-success{% endif %}" style="width: {{ budget.percentage_used }}%"></div>
                 </div>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No budgets set</p>
+        <div class="text-center py-12 text-gray-500">
+            {% include "includes/heroicon.html" with icon_name="archive-box" class="icon-xl mx-auto mb-4 opacity-20" %}
+            <p>No budgets set</p>
+        </div>
         {% endif %}
     </div>
 </div>

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Create Task List - FlowHub{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">New Task List</h1>
+            <p class="page-subtitle">Group related tasks together</p>
+        </div>
+        <a href="{% url 'tasklist_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+
+    <form method="post" class="card space-y-6">
+        {% csrf_token %}
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-400 mb-1">List Name</label>
+            <input type="text" name="name" id="name" required class="w-full bg-bg-tertiary border border-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary" placeholder="e.g. Work, Personal, Marketing Campaign">
+        </div>
+
+        <div>
+            <label for="description" class="block text-sm font-medium text-gray-400 mb-1">Description (Optional)</label>
+            <textarea name="description" id="description" rows="3" class="w-full bg-bg-tertiary border border-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary" placeholder="What is this list for?"></textarea>
+        </div>
+
+        <div>
+            <label for="icon" class="block text-sm font-medium text-gray-400 mb-1">Icon</label>
+            <select name="icon" id="icon" class="w-full bg-bg-tertiary border border-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary">
+                <option value="list-bullet">List</option>
+                <option value="square-2-stack">Stack</option>
+                <option value="star">Star</option>
+                <option value="fire">Fire</option>
+                <option value="check-circle">Check Circle</option>
+                <option value="calendar">Calendar</option>
+                <option value="archive-box">Archive Box</option>
+            </select>
+        </div>
+
+        <div class="pt-4 border-t border-border flex justify-end">
+            <button type="submit" class="btn btn-primary">
+                {% include "includes/heroicon.html" with icon_name="plus" class="icon-sm" %}
+                Create List
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
